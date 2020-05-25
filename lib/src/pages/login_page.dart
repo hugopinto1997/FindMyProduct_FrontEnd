@@ -86,9 +86,9 @@ Widget _loginForm(BuildContext context){
               borderRadius: BorderRadius.circular(10),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 3,
-                  spreadRadius: 5,
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  spreadRadius: 3,
                   offset: Offset(0.0, 5.0),
                 ),
               ],
