@@ -3,8 +3,15 @@ import 'package:prototipo_super_v2/src/pages/tabs/tab_camera_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_contactos_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_home_page.dart';
 import 'package:provider/provider.dart';
+import 'package:camera/camera.dart';
+
+
+
+
 
 class HomePage extends StatefulWidget {
+  final List<CameraDescription> cameras;
+  HomePage(this.cameras);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -16,7 +23,7 @@ class _HomePageState extends State<HomePage> {
     return ChangeNotifierProvider(
       create: (_) => new _NavegacionModel(),
       child: Scaffold(
-        body: _Paginas(),
+        body: _Paginas(cameras: widget.cameras,),
         bottomNavigationBar: _BottomNavigation(),
       ),
     );
@@ -74,7 +81,8 @@ class _BottomNavigation extends StatelessWidget {
 }
 
 class _Paginas extends StatelessWidget {
-  
+  final List<CameraDescription> cameras;
+  _Paginas({@required this.cameras});
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +97,7 @@ class _Paginas extends StatelessWidget {
          
         TabHomePage(),
 
-        TabCameraPage(),        
+        TabCameraPage(cameras),        
         
         TabContactosPage(),
       ],
