@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:prototipo_super_v2/src/bloc/login_bloc.dart';
 import 'package:prototipo_super_v2/src/pages/home_page.dart';
 import 'package:prototipo_super_v2/src/pages/login_page.dart';
+import 'package:prototipo_super_v2/src/pages/tabs/tab_camera_page.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
 
@@ -42,6 +43,7 @@ class _MaterialChild extends StatelessWidget {
       routes: {
         'login': (BuildContext context) => LoginPage(),
         'home': (BuildContext context) => HomePage(cameras),
+        'camara': (BuildContext context) => TabCameraPage(cameras),
       },
       theme: ThemeData.light(),
     );

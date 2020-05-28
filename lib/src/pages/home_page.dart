@@ -4,8 +4,7 @@ import 'package:prototipo_super_v2/src/pages/tabs/tab_contactos_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_home_page.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
-import 'package:tflite/tflite.dart';
-import 'dart:math' as math;
+
 
 
 
