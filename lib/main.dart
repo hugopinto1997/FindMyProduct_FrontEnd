@@ -3,8 +3,20 @@ import 'package:prototipo_super_v2/src/bloc/login_bloc.dart';
 import 'package:prototipo_super_v2/src/pages/home_page.dart';
 import 'package:prototipo_super_v2/src/pages/login_page.dart';
 import 'package:provider/provider.dart';
+import 'package:camera/camera.dart';
+
  
-void main() => runApp(MyApp());
+List<CameraDescription> cameras;
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try{
+    cameras = await availableCameras();
+  } on CameraException catch (e) {
+    print('Error: $e.code\nError Message: $e.message');
+  }
+  runApp(MyApp());
+}
  
 class MyApp extends StatelessWidget {
   @override
@@ -29,7 +41,7 @@ class _MaterialChild extends StatelessWidget {
       initialRoute: 'login',
       routes: {
         'login': (BuildContext context) => LoginPage(),
-        'home': (BuildContext context) => HomePage(),
+        'home': (BuildContext context) => HomePage(cameras),
       },
       theme: ThemeData.light(),
     );

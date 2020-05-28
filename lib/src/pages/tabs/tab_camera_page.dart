@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
+import 'package:tflite/tflite.dart';
+import 'dart:math' as math;
 
 class TabCameraPage extends StatefulWidget {
+  final List<CameraDescription> cameras;
+  TabCameraPage(this.cameras);
 
   @override
   _TabCameraPageState createState() => _TabCameraPageState();
