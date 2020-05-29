@@ -43,7 +43,31 @@ class BndBox extends StatelessWidget {
           if (_y < difH / 2) h -= (difH / 2 - _y) * scaleH;
         }
 
-        return Positioned(
+        return ( _x < 0.1 || _y < 0.1 || _w < 0.1 || _h < 0.1) ? Center(
+          child: Container(
+            margin: EdgeInsets.symmetric(vertical: 225),
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white24,
+
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                CircularProgressIndicator(),
+                SizedBox(height: 20,),
+                Text('Detetectando objeto...', style: TextStyle(
+                  color: Color.fromRGBO(255, 255, 255, 1.0),
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                ),  
+                ),
+              ],
+            ),
+          ),
+        ) : 
+        Positioned(
           left: math.max(0, x),
           top: math.max(0, y),
           width: w,
@@ -57,10 +81,10 @@ class BndBox extends StatelessWidget {
               ),
             ),
             child: new Text(
-              "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}%",
+              "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}% $_x",
               style: TextStyle(
                 color: Color.fromRGBO(37, 213, 253, 1.0),
-                fontSize: 14.0,
+                fontSize: 16.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
