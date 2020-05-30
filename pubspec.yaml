@@ -54,6 +54,7 @@ flutter:
   assets:
    - assets/custom-voc.txt
    - assets/custom-voc.tflite
+   - assets/no-image.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

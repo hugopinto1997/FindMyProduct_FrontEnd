@@ -109,23 +109,23 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
 
   Widget _listaMap(BuildContext context,Map<String, dynamic> user){
         return Container(
-                  margin: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-                  padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
-                  child: Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-                      color: Theme.of(context).cardColor,
-                      margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-                      elevation: 5.0,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                          child: ListTile(
-                          onTap: () { },
-                          leading: Icon(Icons.shopping_cart, color: Colors.indigo, size: 48),
-                          title: Text(user['name'], style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
-                          subtitle:  Text('Productos seleccionados: ${user['quantity'].toString()}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
-                          trailing: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue, size: 12,),
-                        ),
-                      ),
+            margin: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
+            padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+            child: Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                color: Theme.of(context).cardColor,
+                margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                elevation: 5.0,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                    child: ListTile(
+                    onTap: () { Navigator.pushNamed(context, 'listDetail'); },
+                    leading: Icon(Icons.shopping_cart, color: Colors.indigo, size: 48),
+                    title: Text(user['name'], style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
+                    subtitle:  Text('Productos seleccionados: ${user['quantity'].toString()}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
+                    trailing: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue, size: 12,),
+                  ),
+                ),
               ),
                 );
   }
