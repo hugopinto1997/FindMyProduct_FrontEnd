@@ -101,7 +101,7 @@ class _BottomNavigation extends StatelessWidget {
                 margin: EdgeInsets.all(0),
                 padding: EdgeInsets.all(5),
                 color: (navegacionModel.paginaActual == 4) ? Colors.blueAccent : Theme.of(context).cardColor,
-                child: Icon(Icons.person_pin, color: (navegacionModel.paginaActual == 3) ? Colors.white : Theme.of(context).iconTheme.color ,),
+                child: Icon(Icons.person_pin, color: (navegacionModel.paginaActual == 4) ? Colors.white : Theme.of(context).iconTheme.color ,),
               ),
               ),
             title: Container(),

@@ -11,7 +11,7 @@ class _TabContactosPageState extends State<TabContactosPage> {
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: AppBar(
-        title: Text('Contactos', style: Theme.of(context).textTheme.title),
+        title: Text('Contactos', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white)),
         centerTitle: true,
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,

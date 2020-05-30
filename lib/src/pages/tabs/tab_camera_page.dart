@@ -53,7 +53,7 @@ class _TabCameraPageState extends State<TabCameraPage> {
     //onSelect();
     return Scaffold(
        appBar: AppBar(
-        title: Text('Cámara', style: Theme.of(context).textTheme.title),
+        title: Text('Cámara', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white)),
         centerTitle: true,
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,

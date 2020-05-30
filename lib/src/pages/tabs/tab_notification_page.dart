@@ -11,7 +11,7 @@ class _TabNotificationPageState extends State<TabNotificationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: AppBar(
-        title: Text('Notificaciones', style: Theme.of(context).textTheme.title),
+        title: Text('Notificaciones', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white)),
         centerTitle: true,
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,

@@ -47,7 +47,7 @@ class _MaterialChild extends StatelessWidget {
         'camara': (BuildContext context) => TabCameraPage(cameras),
         'listDetail': (BuildContext context) => ListDetail(),
       },
-      theme: ThemeData.dark(),
+      theme: ThemeData.light(),
     );
   }
 }

@@ -11,7 +11,7 @@ class _TabUserPageState extends State<TabUserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: AppBar(
-        title: Text('Perfil', style: Theme.of(context).textTheme.title),
+        title: Text('Perfil', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white)),
         centerTitle: true,
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
