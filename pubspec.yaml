@@ -25,9 +25,10 @@ dependencies:
   cupertino_icons: ^0.1.2
   http: ^0.12.0+4
   provider:
-  web_socket_channel:
   rxdart:
   fluttertoast: ^4.0.1
+  action_cable_stream: ^0.0.2
+
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +54,7 @@ flutter:
   assets:
    - assets/custom-voc.txt
    - assets/custom-voc.tflite
+   - assets/no-image.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

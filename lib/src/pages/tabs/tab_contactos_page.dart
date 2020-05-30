@@ -11,11 +11,11 @@ class _TabContactosPageState extends State<TabContactosPage> {
   Widget build(BuildContext context) {
     return Scaffold(
        appBar: AppBar(
-        title: Text('Contactos', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white),),
+        title: Text('Contactos', style: Theme.of(context).textTheme.title),
         centerTitle: true,
+        elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
       ),
-      backgroundColor: Colors.green,
       body: Center(child: Text('Home Page'),),
     );
   }
