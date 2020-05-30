@@ -25,9 +25,10 @@ dependencies:
   cupertino_icons: ^0.1.2
   http: ^0.12.0+4
   provider:
-  web_socket_channel:
   rxdart:
   fluttertoast: ^4.0.1
+  action_cable_stream: ^0.0.2
+
 
 dev_dependencies:
   flutter_test:

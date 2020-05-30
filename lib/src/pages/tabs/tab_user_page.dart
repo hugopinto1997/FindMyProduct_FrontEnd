@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+
+class TabUserPage extends StatefulWidget {
+
+  @override
+  _TabUserPageState createState() => _TabUserPageState();
+}
+
+class _TabUserPageState extends State<TabUserPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+       appBar: AppBar(
+        title: Text('Perfil', style: Theme.of(context).textTheme.title),
+        centerTitle: true,
+        elevation: 5,
+        backgroundColor: Theme.of(context).appBarTheme.color,
+      ),
+      body: Center(child: Text('User Page'),),
+    );
+  }
+}

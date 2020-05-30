@@ -39,13 +39,13 @@ class _MaterialChild extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Find My Product',
-      initialRoute: 'login',
+      initialRoute: 'home',
       routes: {
         'login': (BuildContext context) => LoginPage(),
         'home': (BuildContext context) => HomePage(cameras),
         'camara': (BuildContext context) => TabCameraPage(cameras),
       },
-      theme: ThemeData.light(),
+      theme: ThemeData.dark(),
     );
   }
 }
