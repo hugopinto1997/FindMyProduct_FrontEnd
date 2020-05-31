@@ -43,7 +43,7 @@ class BndBox extends StatelessWidget {
           if (_y < difH / 2) h -= (difH / 2 - _y) * scaleH;
         }
 
-        return ( _x < 0.09 || _y < 0.09 || _w < 0.1 || _h < 0.1) ? Center(
+        return ( _x < 0.09 || _y < 0.09 || _w < 0.09 || _h < 0.09) ? Center(
           child: Container(
             margin: EdgeInsets.symmetric(vertical: 225),
             padding: EdgeInsets.symmetric(horizontal: 20),
