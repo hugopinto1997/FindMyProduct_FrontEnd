@@ -1,6 +1,6 @@
 # FindMyProduct 
 
-A new Flutter mobile application and using Tensorflow Lite.
+A new Flutter mobile application with some features using Tensorflow Lite.
 
 ## Introduction
 
