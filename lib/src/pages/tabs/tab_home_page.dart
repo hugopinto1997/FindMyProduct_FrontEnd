@@ -3,46 +3,44 @@ import 'dart:convert';
 import 'package:action_cable_stream/action_cable_stream.dart';
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
+import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
+import 'package:provider/provider.dart';
 
 class TabHomePage extends StatefulWidget {
+  BuildContext ctx;
+  TabHomePage({this.ctx});
 
   @override
   _TabHomePageState createState() => _TabHomePageState();
 }
 
 class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClientMixin {
+
   ActionCable _cable2;
   final String _channel = "List";
   String actioncableurl = 'wss://findmyproduct-api.herokuapp.com/api/v1/cable';
+  ListsActionCableProvider listCable;
 
 
   @override
-  void initState() {
+  void initState() { 
     super.initState();
-
-    _cable2 = ActionCable.Stream(actioncableurl);
-    _cable2.stream.listen((value) {
-        if (value is ActionCableConnected) {
-          _cable2.subscribeToChannel(_channel, channelParams: {'room': "private"});
-         print('ActionCableConnected');
-        } else if (value is ActionCableSubscriptionConfirmed) {
-          print('ActionCableSubscriptionConfirmed');
-          _cable2.performAction(_channel, 'message',
-              channelParams: {'room': "private"},actionParams: {'id': 1});
-        } else if (value is ActionCableMessage) {
-          print('ActionCableMessage ${jsonEncode(value.message)}');
-        }
-      });
+    listCable = Provider.of<ListsActionCableProvider>(widget.ctx);
+    listCable.initCable();
   }
 
-  @override
+@override
   void dispose() {
     super.dispose();
-    _cable2.disconnect();
+    /* Even if this Widget uses the mixin to keep alive, eventually the cache memory of the phone could get full and the widget should start its lifecycle again (That's why I called initCable inside initState) */
+    print('Disposed Action Cable');
+    listCable.disposeCable();
   }
+
 
   @override
   Widget build(BuildContext context) {
+    listCable = Provider.of<ListsActionCableProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Tus listas', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white),),
@@ -52,9 +50,10 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
       ),
       body: Column(
         children: <Widget>[
+          SizedBox(height: 10,),
           Expanded(
             child: StreamBuilder(
-              stream: _cable2.stream,
+              stream: listCable.getCable().stream,
               initialData: ActionCableInitial(),
               builder: (context, AsyncSnapshot<ActionCableDataState> snapshot){
                   if(snapshot.hasData){

@@ -127,7 +127,7 @@ class _Paginas extends StatelessWidget {
       physics: NeverScrollableScrollPhysics(),
       children: <Widget>[
          
-        TabHomePage(),
+        TabHomePage(ctx: context,),
 
         TabNotificationPage(),
 

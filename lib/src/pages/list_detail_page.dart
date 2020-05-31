@@ -78,7 +78,7 @@ class _ListDetailState extends State<ListDetail> {
           ClipRRect(
                 borderRadius: BorderRadius.circular(15.0),
                 child: FadeInImage(
-                  placeholder: AssetImage('data/assets/no-image.jpg'),
+                  placeholder: AssetImage('assets/no-image.jpg'),
                   image: NetworkImage('https://previews.123rf.com/images/val2014/val20141603/val2014160300006/54302308-shopping-cart-icon.jpg'),
                  height: 80.0,
                 ),
