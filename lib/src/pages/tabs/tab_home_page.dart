@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:action_cable_stream/action_cable_stream.dart';
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
@@ -16,9 +15,6 @@ class TabHomePage extends StatefulWidget {
 
 class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClientMixin {
 
-  ActionCable _cable2;
-  final String _channel = "List";
-  String actioncableurl = 'wss://findmyproduct-api.herokuapp.com/api/v1/cable';
   ListsActionCableProvider listCable;
 
 
@@ -50,7 +46,6 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
       ),
       body: Column(
         children: <Widget>[
-          SizedBox(height: 10,),
           Expanded(
             child: StreamBuilder(
               stream: listCable.getCable().stream,
@@ -106,7 +101,7 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
     }
   }
 
-  Widget _listaMap(BuildContext context,Map<String, dynamic> user){
+  Widget _listaMap(BuildContext context,Map<String, dynamic> listItem){
         return Container(
             margin: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
             padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
@@ -118,10 +113,10 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                     child: ListTile(
-                    onTap: () { Navigator.pushNamed(context, 'listDetail'); },
+                    onTap: () { Navigator.pushNamed(context, 'listDetail', arguments: listItem); },
                     leading: Icon(Icons.shopping_cart, color: Colors.indigo, size: 48),
-                    title: Text(user['name'], style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
-                    subtitle:  Text('Productos seleccionados: ${user['quantity'].toString()}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
+                    title: Text(listItem['name'], style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
+                    subtitle:  Text('Productos seleccionados: ${listItem['quantity'].toString()}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
                     trailing: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue, size: 12,),
                   ),
                 ),

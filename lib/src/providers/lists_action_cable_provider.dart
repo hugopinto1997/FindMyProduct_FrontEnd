@@ -1,4 +1,3 @@
-import 'dart:convert';
 
 import 'package:action_cable_stream/action_cable_stream.dart';
 import 'package:action_cable_stream/action_cable_stream_states.dart';

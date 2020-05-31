@@ -15,6 +15,9 @@ class _TabUserPageState extends State<TabUserPage> {
         centerTitle: true,
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.settings), onPressed: () {}, alignment: Alignment.centerLeft,)
+        ],
       ),
       body: Center(child: Text('User Page'),),
     );
