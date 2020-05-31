@@ -1,16 +1,13 @@
 # FindMyProduct 
 
-A new Flutter project.
+A new Flutter mobile application and using Tensorflow Lite.
 
-## Getting Started
+## Introduction
 
-This project is a starting point for a Flutter application.
+This project is an mobile application using Flutter with help of Tensorflow Lite, the final purpose is to help people with their supermarket buyings, recognizing objects with the phone camera to make easier to someone who's in charge of buy, in simple words is like an supermarket list into your phone with help of new technologies that would make your buyings more easy and enjoyable.
 
-A few resources to get you started if this is your first Flutter project:
+To download and run it just clone the repo and do the following into your terminal:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+- flutter pub get
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+If necessary, open Android Studio and synchronize Gradle Files
