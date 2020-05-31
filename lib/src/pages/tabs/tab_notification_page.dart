@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
 
 class TabNotificationPage extends StatefulWidget {
 
@@ -16,7 +17,7 @@ class _TabNotificationPageState extends State<TabNotificationPage> {
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
       ),
-      body: Center(child: Text('Notification Page'),),
+      body: NoData(Icons.notifications_off, 'No tiene ninguna notificación'),
     );
   }
 }

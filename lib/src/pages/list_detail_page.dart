@@ -8,7 +8,7 @@ class ListDetail extends StatefulWidget {
 }
 
 class _ListDetailState extends State<ListDetail> {
-  
+  Map<String, dynamic> _listItem;
 
   List<String> _fotos = [
     'https://www.postconsumerbrands.com/wp-content/uploads/2019/11/Post_Hostess_Twinkies_Cereal_Box.jpg?fbclid=IwAR01YBS7woWDTmk2CZt_klrvI3NWT0c65pQAUBiTCyG2f3QLrcY9BrN_EMw',
@@ -20,15 +20,16 @@ class _ListDetailState extends State<ListDetail> {
 
   @override
   Widget build(BuildContext context) {
+    _listItem = ModalRoute.of(context).settings.arguments;
     return Scaffold(
         body: CustomScrollView(
           slivers: <Widget>[
-            _crearAppBar(),
+            _crearAppBar(_listItem),
             SliverList(
               delegate: SliverChildListDelegate(
                 <Widget>[
                   SizedBox(height: 8.0,),
-                  _posterTitulo(context),
+                  _posterTitulo(context, _listItem),
                   SizedBox(height: 10.0,),
 
                   _crearLista2(context, 'Producto', _fotos[0]) ,  
@@ -45,13 +46,17 @@ class _ListDetailState extends State<ListDetail> {
   }
 
 
-  Widget _crearAppBar(){
+  Widget _crearAppBar(Map<String, dynamic> listItem){
       return SliverAppBar(
         elevation: 2.0,
         backgroundColor: Colors.blueGrey,
         expandedHeight: 200.0,
         floating: false,
         pinned: true,
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.mode_edit), onPressed: () {},),
+        ],
         flexibleSpace: FlexibleSpaceBar(
           centerTitle: true,
           background: FadeInImage(
@@ -59,7 +64,7 @@ class _ListDetailState extends State<ListDetail> {
             placeholder: AssetImage('assets/no-image.jpg'),
             image: NetworkImage('https://cdn-ep19.pressidium.com/wp-content/uploads/2018/10/photoshop-collage-muang-mai-markets.jpg')),
           title: Text(
-            'Lista de Walmart',
+            '${listItem['name']}',
             overflow: TextOverflow.ellipsis,maxLines: 1,
             style: TextStyle(fontSize: 16.0,
            ),
@@ -69,7 +74,7 @@ class _ListDetailState extends State<ListDetail> {
       );
   }
 
-  Widget _posterTitulo(BuildContext context){
+  Widget _posterTitulo(BuildContext context, Map<String, dynamic> listItem){
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
@@ -78,7 +83,7 @@ class _ListDetailState extends State<ListDetail> {
           ClipRRect(
                 borderRadius: BorderRadius.circular(15.0),
                 child: FadeInImage(
-                  placeholder: AssetImage('data/assets/no-image.jpg'),
+                  placeholder: AssetImage('assets/no-image.jpg'),
                   image: NetworkImage('https://previews.123rf.com/images/val2014/val20141603/val2014160300006/54302308-shopping-cart-icon.jpg'),
                  height: 80.0,
                 ),
@@ -89,7 +94,7 @@ class _ListDetailState extends State<ListDetail> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text('Lista de articulos',
+                Text((listItem['name'] != null) ? '${listItem['name']}' : 'No disponible',
                 style: Theme.of(context).textTheme.title,),
                  Text('Creada por: Nombre de Usuario',
                  overflow: TextOverflow.ellipsis,
@@ -104,7 +109,7 @@ class _ListDetailState extends State<ListDetail> {
                     Icon(Icons.add_shopping_cart, size: 25,),
                     SizedBox(width: 2,height:20),
                     Text(
-                      '25 artículos seleccionados', 
+                      (listItem['quantity'] != null) ? '${listItem['quantity']} artículos seleccionados' : '0 artículos seleccionados', 
                       style: TextStyle(fontSize: 16),
                       )
                   ],

@@ -4,6 +4,7 @@ import 'package:prototipo_super_v2/src/pages/home_page.dart';
 import 'package:prototipo_super_v2/src/pages/list_detail_page.dart';
 import 'package:prototipo_super_v2/src/pages/login_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_camera_page.dart';
+import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
 
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider(create: (_) => LoginBloc()),
+        Provider(create: (_) => ListsActionCableProvider(1)),
       ],
       child: _MaterialChild()
     );
@@ -47,7 +49,7 @@ class _MaterialChild extends StatelessWidget {
         'camara': (BuildContext context) => TabCameraPage(cameras),
         'listDetail': (BuildContext context) => ListDetail(),
       },
-      theme: ThemeData.light(),
+      theme: ThemeData.dark(),
     );
   }
 }
