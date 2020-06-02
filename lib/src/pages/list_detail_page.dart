@@ -1,14 +1,27 @@
+import 'dart:convert';
+
+import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
+import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
+import 'package:provider/provider.dart';
 
 
 class ListDetail extends StatefulWidget {
-
+final BuildContext ctx;
+ListDetail({@required this.ctx});
   @override
   _ListDetailState createState() => _ListDetailState();
 }
 
-class _ListDetailState extends State<ListDetail> {
+class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
   Map<String, dynamic> _listItem;
+  Map<String, dynamic> argumentos;
+  int identificador;
+  ListsActionCableProvider _productsCable;
+  int cantidadProductos;
+
 
   List<String> _fotos = [
     'https://www.postconsumerbrands.com/wp-content/uploads/2019/11/Post_Hostess_Twinkies_Cereal_Box.jpg?fbclid=IwAR01YBS7woWDTmk2CZt_klrvI3NWT0c65pQAUBiTCyG2f3QLrcY9BrN_EMw',
@@ -17,31 +30,58 @@ class _ListDetailState extends State<ListDetail> {
   ];
 
 
+  @override
+  void initState() { 
+    super.initState();
+    _productsCable = Provider.of<ListsActionCableProvider>(widget.ctx);
+    _productsCable.initCable();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+     _productsCable.disposeCable();
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    _listItem = ModalRoute.of(context).settings.arguments;
+    argumentos = ModalRoute.of(context).settings.arguments;
+    _listItem = argumentos['listItem'];
+    identificador = argumentos['index'];
+    print(identificador);
     return Scaffold(
-        body: CustomScrollView(
-          slivers: <Widget>[
-            _crearAppBar(_listItem),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                <Widget>[
-                  SizedBox(height: 8.0,),
-                  _posterTitulo(context, _listItem),
-                  SizedBox(height: 10.0,),
-
-                  _crearLista2(context, 'Producto', _fotos[0]) ,  
-                  _crearLista2(context, 'Producto', _fotos[0]) ,
-                  _crearLista2(context, 'Producto', _fotos[0]) ,  
-                  _crearLista2(context, 'Producto', _fotos[0]) ,  
-                                            
-                ]
-              ),
-              )
-          ],
-          ),
+        body: NestedScrollView(
+          headerSliverBuilder: (BuildContext context, bool innerBool){
+            return <Widget>[
+              _crearAppBar(_listItem),
+            ];
+          }, 
+          body: Column(
+            children: <Widget>[
+              SizedBox(height: 8.0,),
+              _posterTitulo(context, _listItem),
+               Flexible(
+                 child: 
+                   StreamBuilder(
+                    stream: _productsCable.getCable().stream,
+                    initialData: ActionCableInitial(),
+                    builder: (context, AsyncSnapshot<ActionCableDataState> snapshot){
+                    if(snapshot.hasData){
+                      return buildBody(snapshot, context);
+                    }else{
+                      return NoData(Icons.add_shopping_cart, 'Algo sucedió, prueba en otro momento');
+                    }
+                  },
+                 ),
+               )
+            ],
+          ), 
+       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add, color: Colors.white,),
+        backgroundColor: Colors.blue,
+        onPressed: (){ }),
     );
   }
 
@@ -49,7 +89,7 @@ class _ListDetailState extends State<ListDetail> {
   Widget _crearAppBar(Map<String, dynamic> listItem){
       return SliverAppBar(
         elevation: 2.0,
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: Colors.indigo ,
         expandedHeight: 200.0,
         floating: false,
         pinned: true,
@@ -62,7 +102,7 @@ class _ListDetailState extends State<ListDetail> {
           background: FadeInImage(
             fit: BoxFit.cover,
             placeholder: AssetImage('assets/no-image.jpg'),
-            image: NetworkImage('https://cdn-ep19.pressidium.com/wp-content/uploads/2018/10/photoshop-collage-muang-mai-markets.jpg')),
+            image: NetworkImage('https://images.theconversation.com/files/223713/original/file-20180619-38837-1t04rux.jpg?ixlib=rb-1.1.0&q=45&auto=format&w=496&fit=clip')),
           title: Text(
             '${listItem['name']}',
             overflow: TextOverflow.ellipsis,maxLines: 1,
@@ -109,8 +149,9 @@ class _ListDetailState extends State<ListDetail> {
                     Icon(Icons.add_shopping_cart, size: 25,),
                     SizedBox(width: 2,height:20),
                     Text(
-                      (listItem['quantity'] != null) ? '${listItem['quantity']} artículos seleccionados' : '0 artículos seleccionados', 
+                      'Lista de artículos', 
                       style: TextStyle(fontSize: 16),
+                      maxLines: 2,
                       )
                   ],
                   ),
@@ -150,16 +191,16 @@ class _ListDetailState extends State<ListDetail> {
                     child: FadeInImage(
                       placeholder: AssetImage('assets/no-image.jpg'),
                       image: NetworkImage(imagen),
-                     height: 125.0, width:90,
+                     height: 100.0, width:90,
                     ),
                 ),
-              SizedBox(width: 20.0,),
+              SizedBox(width: 25.0,),
               Flexible(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Text(nombre,
+                    Text((nombre == null) ? '' : nombre ,
                     style: Theme.of(context).textTheme.title.apply(color: Colors.white),),
                      Text('Cantidad: 1',
                      overflow: TextOverflow.ellipsis,
@@ -188,9 +229,8 @@ class _ListDetailState extends State<ListDetail> {
                       ),
                     ),
                     SizedBox(width: 10),
-
                      Expanded(
-                                            child: ClipRRect(
+                         child: ClipRRect(
                          borderRadius: BorderRadius.circular(25),
                          child: FlatButton(
                            onPressed: () { }, 
@@ -205,6 +245,51 @@ class _ListDetailState extends State<ListDetail> {
       ),
     );
   }
+
+
+  Widget buildBody(AsyncSnapshot<ActionCableDataState> snapshot, BuildContext context) {
+    final state = snapshot.data;
+
+    
+    if (state is ActionCableInitial ||
+        state is ActionCableConnectionLoading ||
+        state is ActionCableSubscribeLoading) {
+      return Center(child: CircularProgressIndicator(),);
+    } else if (state is ActionCableError) {
+      return Center(child: CircularProgressIndicator());
+    } else if (state is ActionCableSubscriptionConfirmed) {
+      return Center(child: CircularProgressIndicator());
+    } else if (state is ActionCableSubscriptionRejected) {
+      return Center(child: CircularProgressIndicator());
+    } else if (state is ActionCableMessage) {
+        final ej = json.decode(jsonEncode(state.message));
+       List<dynamic> res = json.decode(ej['message'])['info'];
+       List<dynamic> productos = res[identificador]['products'];
+      cantidadProductos = productos.length;
+      if(cantidadProductos == 0){
+        return NoData(Icons.add_shopping_cart, 'Aún no tienes ningún producto en esta lista');
+      }else{
+        return ListView.builder(
+           itemCount: productos.length ?? 0,
+           itemBuilder: (context, index){
+             return _crearLista2(context, productos[index]['product_name'].toString() , _fotos[0]);
+           },
+         );
+      }
+      //return Text('${productos.length}');
+    } else if (state is ActionCableDisconnected) {
+      return Text('Disconnected');
+    } else {
+      return Text('Something went wrong');
+    }
+  }
+
+  @override
+  void detach() {
+  }
+
+  @override
+  bool get keptAlive => true;
 
 
 
