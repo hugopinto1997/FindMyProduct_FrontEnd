@@ -1,14 +1,16 @@
 import 'dart:convert';
 
-import 'package:action_cable_stream/action_cable_stream.dart';
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
+import 'package:provider/provider.dart';
 
 
 class ListDetail extends StatefulWidget {
-
+final BuildContext ctx;
+ListDetail({@required this.ctx});
   @override
   _ListDetailState createState() => _ListDetailState();
 }
@@ -17,10 +19,9 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
   Map<String, dynamic> _listItem;
   Map<String, dynamic> argumentos;
   int identificador;
+  ListsActionCableProvider _productsCable;
   int cantidadProductos;
-  ActionCable _cable2;
-  final String _channel = "List";
-  String actioncableurl = 'wss://findmyproduct-api.herokuapp.com/api/v1/cable';
+
 
   List<String> _fotos = [
     'https://www.postconsumerbrands.com/wp-content/uploads/2019/11/Post_Hostess_Twinkies_Cereal_Box.jpg?fbclid=IwAR01YBS7woWDTmk2CZt_klrvI3NWT0c65pQAUBiTCyG2f3QLrcY9BrN_EMw',
@@ -32,27 +33,14 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
   @override
   void initState() { 
     super.initState();
-     _cable2 = ActionCable.Stream(actioncableurl);
-    _cable2.stream.listen((value) {
-        if (value is ActionCableConnected) {
-          _cable2.subscribeToChannel(_channel, channelParams: {'room': "private"});
-         print('ActionCableConnected');
-        } else if (value is ActionCableSubscriptionConfirmed) {
-          print('ActionCableSubscriptionConfirmed');
-          _cable2.performAction(_channel, 'message',
-              channelParams: {'room': "private"},actionParams: {'id': 1});
-        } else if (value is ActionCableMessage) {
-         // final msg = json.decode(jsonEncode(value.message));
-         // List<dynamic> cosa = msg["message"];
-         // print('ActionCableMessage ${cosa.first}');
-        }
-      }); 
+    _productsCable = Provider.of<ListsActionCableProvider>(widget.ctx);
+    _productsCable.initCable();
   }
 
   @override
   void dispose() {
     super.dispose();
-     _cable2.disconnect();
+     _productsCable.disposeCable();
   }
 
 
@@ -76,7 +64,7 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
                Flexible(
                  child: 
                    StreamBuilder(
-                    stream: _cable2.stream,
+                    stream: _productsCable.getCable().stream,
                     initialData: ActionCableInitial(),
                     builder: (context, AsyncSnapshot<ActionCableDataState> snapshot){
                     if(snapshot.hasData){
