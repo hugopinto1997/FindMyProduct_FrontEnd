@@ -84,16 +84,17 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
     } else if (state is ActionCableSubscriptionRejected) {
       return Center(child: CircularProgressIndicator());
     } else if (state is ActionCableMessage) {
-         final ej = json.decode(jsonEncode(state.message));
-         List<dynamic> res = ej["message"];
+       final ej = json.decode(jsonEncode(state.message));
+       List<dynamic> res = json.decode(ej['message'])['info'];
+       
         
          return ListView.builder(
            itemCount: res.length ?? 0,
            itemBuilder: (context, index){
-             return _listaMap(context, res[index]);
+             return _listaMap(context, res[index], index);
            },
          );
-         //return Text('${res}');
+        // return Text('${res[0]}');
     } else if (state is ActionCableDisconnected) {
       return Text('Disconnected');
     } else {
@@ -101,7 +102,7 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
     }
   }
 
-  Widget _listaMap(BuildContext context,Map<String, dynamic> listItem){
+  Widget _listaMap(BuildContext context,Map<String, dynamic> listItem, int index){
         return Container(
             margin: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
             padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
@@ -113,10 +114,10 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                     child: ListTile(
-                    onTap: () { Navigator.pushNamed(context, 'listDetail', arguments: listItem); },
+                    onTap: () { Navigator.pushNamed(context, 'listDetail', arguments: {'listItem': listItem, 'index': index}); },
                     leading: Icon(Icons.shopping_cart, color: Colors.indigo, size: 48),
                     title: Text(listItem['name'], style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
-                    subtitle:  Text('Productos seleccionados: ${listItem['quantity'].toString()}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
+                    subtitle:  Text('Productos seleccionados: ${listItem['products'].length}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
                     trailing: Icon(Icons.arrow_forward_ios, color: Colors.lightBlue, size: 12,),
                   ),
                 ),
