@@ -10,7 +10,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="Find My Product"
-        android:icon="@mipmap/logo">
+        android:icon="@mipmap/fmp">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

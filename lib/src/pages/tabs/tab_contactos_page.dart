@@ -20,7 +20,7 @@ class _TabContactosPageState extends State<TabContactosPage> {
           IconButton(icon: Icon(Icons.search), onPressed: () {}, alignment: Alignment.centerLeft,),
         ],
       ),
-      body:  NoData(Icons.perm_contact_calendar, 'No tiene ningún contacto guardado'),
+      body:  NoData(Icons.perm_contact_calendar, 'No tienes ningún contacto guardado'),
     );
   }
 }

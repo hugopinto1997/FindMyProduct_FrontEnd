@@ -17,7 +17,7 @@ class _TabNotificationPageState extends State<TabNotificationPage> {
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
       ),
-      body: NoData(Icons.notifications_off, 'No tiene ninguna notificación'),
+      body: NoData(Icons.notifications_off, 'No tienes ninguna notificación'),
     );
   }
 }
