@@ -269,14 +269,14 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
       if(cantidadProductos == 0){
         return NoData(Icons.add_shopping_cart, 'Aún no tienes ningún producto en esta lista');
       }else{
-        return ListView.builder(
+       return ListView.builder(
            itemCount: productos.length ?? 0,
            itemBuilder: (context, index){
              return _crearLista2(context, productos[index]['product_name'].toString() , _fotos[0]);
            },
          );
+       //return Text('${res}');
       }
-      //return Text('${productos.length}');
     } else if (state is ActionCableDisconnected) {
       return Text('Disconnected');
     } else {

@@ -3,6 +3,7 @@ import 'package:prototipo_super_v2/src/bloc/login_bloc.dart';
 import 'package:prototipo_super_v2/src/pages/home_page.dart';
 import 'package:prototipo_super_v2/src/pages/list_detail_page.dart';
 import 'package:prototipo_super_v2/src/pages/login_page.dart';
+import 'package:prototipo_super_v2/src/pages/register_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_camera_page.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:provider/provider.dart';
@@ -42,9 +43,10 @@ class _MaterialChild extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Find My Product',
-      initialRoute: 'home',
+      initialRoute: 'login',
       routes: {
         'login': (BuildContext context) => LoginPage(),
+        'register': (BuildContext context) => RegisterPage(),
         'home': (BuildContext context) => HomePage(cameras),
         'camara': (BuildContext context) => TabCameraPage(cameras),
         'listDetail': (BuildContext context) => ListDetail(ctx: context,),

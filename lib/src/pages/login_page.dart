@@ -197,7 +197,7 @@ Widget _loginForm(BuildContext context){
           elevation: 0.0,
           color: Colors.blueAccent,
           textColor: Colors.white,
-          onPressed: () => showModal(context, 'f'),
+          onPressed: () => Navigator.pushNamed(context, 'register'),
         );
   }
 
