@@ -21,6 +21,11 @@ class _TabContactosPageState extends State<TabContactosPage> {
         ],
       ),
       body:  NoData(Icons.perm_contact_calendar, 'No tienes ningún contacto guardado'),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){ },
+        child: Icon(Icons.group_add, color: Colors.white,),
+        backgroundColor: Colors.blueGrey,
+      ),
     );
   }
 }

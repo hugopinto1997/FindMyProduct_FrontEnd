@@ -6,14 +6,24 @@ import 'package:prototipo_super_v2/src/pages/login_page.dart';
 import 'package:prototipo_super_v2/src/pages/register_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_camera_page.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
+import 'package:prototipo_super_v2/src/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
  
 List<CameraDescription> cameras;
+SharedPreferences prefs;
+String pagina;
+bool temaActivo;
+int loggedUser;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  prefs = await SharedPreferences.getInstance();
+  pagina = prefs.getString('token') ?? '';
+  temaActivo = prefs.getBool('dark') ?? false;
+  loggedUser = prefs.getInt('id');
   try{
     cameras = await availableCameras();
   } on CameraException catch (e) {
@@ -28,7 +38,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider(create: (_) => LoginBloc()),
-        Provider(create: (_) => ListsActionCableProvider(1)),
+        Provider(create: (_) => ListsActionCableProvider(loggedUser)),
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(temaActivo),
+        ),
       ],
       child: _MaterialChild()
     );
@@ -40,10 +53,11 @@ class _MaterialChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Find My Product',
-      initialRoute: 'login',
+      initialRoute: (pagina.isEmpty) ? 'login' : 'home',
       routes: {
         'login': (BuildContext context) => LoginPage(),
         'register': (BuildContext context) => RegisterPage(),
@@ -51,7 +65,7 @@ class _MaterialChild extends StatelessWidget {
         'camara': (BuildContext context) => TabCameraPage(cameras),
         'listDetail': (BuildContext context) => ListDetail(ctx: context,),
       },
-      theme: ThemeData.dark(),
+      theme: theme.getTheme(),
     );
   }
 }

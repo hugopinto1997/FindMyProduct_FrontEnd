@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 void showModal(BuildContext context, String error){
@@ -16,3 +17,11 @@ void showModal(BuildContext context, String error){
     }, 
   );
 }
+
+void logout(BuildContext context) async{
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('token', '');
+    prefs.setInt('id', 0);
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    Navigator.pushReplacementNamed(context, 'login');
+  }

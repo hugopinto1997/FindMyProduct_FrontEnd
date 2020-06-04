@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/bloc/login_bloc.dart';
+import 'package:prototipo_super_v2/src/providers/usuario_provider.dart';
 import 'package:prototipo_super_v2/src/utils/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({Key key}) : super(key: key);
@@ -202,17 +205,18 @@ Widget _loginForm(BuildContext context){
   }
 
   _login(LoginBloc bloc, BuildContext context) async {
-    //final usuarioProvider = new UsuarioProvider();
-    //final prefs = await SharedPreferences.getInstance();
+    final usuarioProvider = new UsuarioProvider();
+    final prefs = await SharedPreferences.getInstance();
     //print("Email: ");
-    //final Map<String, dynamic> entra = await usuarioProvider.login(bloc.email, bloc.password);
-   // if(entra.containsKey('token')){
+    final Map<String, dynamic> entra = await usuarioProvider.login(bloc.email, bloc.password);
+    if(entra.containsKey('token')){
       Navigator.pushReplacementNamed(context, 'home');
-     // prefs.setString('token', entra['token']);
-     // Fluttertoast.showToast(msg: '${entra['token']}', toastLength: Toast.LENGTH_LONG);
-   // }else{
-      //showModal(context, entra['error']);
-    //}
+      prefs.setString('token', entra['token']);
+      prefs.setInt('id', entra['id']);
+      Fluttertoast.showToast(msg: '${entra['token']}', toastLength: Toast.LENGTH_LONG);
+    }else{
+      showModal(context, entra['error']);
+    }
   }
 
 }

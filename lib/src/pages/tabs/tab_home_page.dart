@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
+import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
 
 class TabHomePage extends StatefulWidget {
@@ -54,7 +55,7 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                   if(snapshot.hasData){
                     return buildBody(snapshot, context);
                   }else{
-                    return Center(child: CircularProgressIndicator());
+                    return NoData(Icons.format_list_bulleted, 'No tienes ninguna lista');
                   }
       },
     ),
@@ -87,13 +88,17 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
        final ej = json.decode(jsonEncode(state.message));
        List<dynamic> res = json.decode(ej['message'])['info'];
        
-        
-         return ListView.builder(
+        if(res.length == 0){
+          return NoData(Icons.format_list_bulleted, 'No tienes ninguna lista');
+        }else{
+          return ListView.builder(
            itemCount: res.length ?? 0,
            itemBuilder: (context, index){
              return _listaMap(context, res[index], index);
            },
          );
+        }
+         
         // return Text('${res[0]}');
     } else if (state is ActionCableDisconnected) {
       return Text('Disconnected');
