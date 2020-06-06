@@ -1,6 +1,11 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:prototipo_super_v2/src/models/user_model.dart';
+import 'package:prototipo_super_v2/src/providers/usuario_provider.dart';
+import 'package:prototipo_super_v2/src/utils/utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class RegisterPage extends StatefulWidget {
 
@@ -12,6 +17,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final formKey = GlobalKey<FormState>();
   final passKey = GlobalKey<FormFieldState>();
+  User _usuario = new User();
 
 
 
@@ -19,7 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Regístrate a FindMyProduct'),
+        title: Text('Regístrate'),
       ),
       body: Stack(
         children: <Widget>[
@@ -149,6 +155,7 @@ Widget _crearUsername(){
           //counterText: snapshot.data,
           //errorText: snapshot.error,
             ),
+         onSaved: (u) => _usuario.username = u,
          validator: (value){
             if (value.length == 0) { return 'Nombre de Usuario no puede ir vacío'; 
             }else { return null; }
@@ -169,6 +176,7 @@ Widget _crearEmail(){
           //counterText: snapshot.data,
           //errorText: snapshot.error,
             ),
+           onSaved: (email) => _usuario.email = email,
            validator: (correo) {
              final bool correoValido = EmailValidator.validate(correo); 
              if(correo.length == 0){
@@ -219,6 +227,7 @@ Widget _crearConfirmarPassword(){
          labelText: 'Confirmar contraseña',
          counterText: 'Al menos 6 caracteres',
        ),
+       onSaved: (pass) => _usuario.password = pass,
        validator: (pass){
          var contrasena = passKey.currentState.value;
          if(pass.length == 0){
@@ -247,7 +256,8 @@ Widget _crearTelefono(){
          hintText: '70000000',
          labelText: 'Teléfono celular',
         ),
-            validator: (telefono){
+      onSaved: (phone) => _usuario.phone = phone.toString(),  
+      validator: (telefono){
               String pattern = r'(^([6-7]{1})?[0-9]{7}$)';
               RegExp r = new RegExp(pattern);
               if(telefono.length == 0){
@@ -273,17 +283,42 @@ Widget _crearBotonRegister(BuildContext context){
           elevation: 0.0,
           color: Colors.indigo,
           textColor: Colors.white,
-          onPressed: () { _submit(); },
+          onPressed: () { _submit(context); },
         );
   }
 
 
-void _submit(){
+void _submit(BuildContext context) async {
+    final usuarioProvider = new UsuarioProvider();
+    final prefs = await SharedPreferences.getInstance();
+    
+
   if( formKey.currentState.validate() ){
-    Fluttertoast.showToast(msg: 'valido', toastLength: Toast.LENGTH_LONG);
+    formKey.currentState.save();
+    final Map<String, dynamic> entra = await usuarioProvider.register(_usuario);
+    final Map<String,dynamic> resp = entra['resp'];
+    //Si entra aqui si hace login
+    if(resp.containsKey('status')){
+       final Map<String, dynamic> entra2 = await usuarioProvider.login(_usuario.email, _usuario.password);
+    if(entra2.containsKey('token')){
+      prefs.setString('token', entra2['token']);
+      prefs.setInt('id', entra2['id']);
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.pushReplacementNamed(context, 'home');
+    Fluttertoast.showToast(msg: '${entra['resp']['status']}', toastLength: Toast.LENGTH_LONG);
+    }else{
+      showModal(context, entra['error']);
+    }
   }else{
-     Fluttertoast.showToast(msg: 'NEL', toastLength: Toast.LENGTH_LONG);
+    final Map<String, dynamic> entra = await usuarioProvider.register(_usuario);
+    final Map<String,dynamic> resp = entra['resp'];
+    showModal(context, '${resp['errors']}');
+  }
+     //Navigator.pushReplacementNamed(context, 'home');
+     // prefs.setString('token', entra['token']);
+    //  prefs.setInt('id', entra['id']);
   }
 }
 
 }
+

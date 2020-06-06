@@ -5,7 +5,7 @@ class ThemeProvider with ChangeNotifier{
   ThemeData _tema;
   List<ThemeData> _temas = [
     ThemeData.light(),
-    ThemeData.dark()
+    ThemeData.dark().copyWith(primaryColor: Colors.indigo)
   ];
 
   ThemeProvider(bool t){

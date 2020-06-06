@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
@@ -272,10 +273,11 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
        return ListView.builder(
            itemCount: productos.length ?? 0,
            itemBuilder: (context, index){
-             return _crearLista2(context, productos[index]['product_name'].toString() , _fotos[0]);
+             /*return _crearLista2(context, productos[index]['product_name'].toString() , _fotos[0]);*/
+             return _buildListItem(context,productos[index]);
            },
          );
-       //return Text('${res}');
+        // return Text('${res}');
       }
     } else if (state is ActionCableDisconnected) {
       return Text('Disconnected');
@@ -291,6 +293,76 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
   @override
   bool get keptAlive => true;
 
+
+
+
+
+
+
+Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
+    return Slidable(
+      actionPane: SlidableDrawerActionPane(),
+      actions: <Widget>[
+        IconSlideAction(
+          caption: 'Eliminar',
+          color: Colors.green,
+          icon: Icons.edit,
+          onTap: () {},
+        )
+      ],
+      secondaryActions: <Widget>[
+        IconSlideAction(
+          caption: 'Eliminar',
+          color: Colors.red,
+          icon: Icons.delete,
+          onTap: () {},
+        )
+      ],
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0.0)),
+        color: Theme.of(context).cardColor,
+        margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+        elevation: 10.0,
+        child: CheckboxListTile(
+          activeColor: Colors.green,
+          secondary: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('Cant.', style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 16),),
+              SizedBox(height: 0,),
+              Text('5', style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 20),),
+          ],),
+          title: Text('${product['product_name']}', style: Theme.of(context).textTheme.title,),
+          subtitle: (product['product_descripcion'] == null) ? Text('Sin descripción', style: Theme.of(context).textTheme.subtitle1,) : Text('${product['product_descripcion']}',  style: Theme.of(context).textTheme.subtitle1,),
+          value: (product['product_status'] == null) ? true : product['product_status'],
+          onChanged: (newValue) {
+                
+              },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildListItem(BuildContext context, Map<String, dynamic> product) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 2,
+                  spreadRadius: 1,
+                  offset: Offset(0.0, 5.0),
+                ),
+        ],
+      ),
+      margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.0),
+              child: _buildSlidableItem(context,product) ,
+      ),
+    );
+  }
 
 
 }

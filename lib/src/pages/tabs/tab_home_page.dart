@@ -45,23 +45,26 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
       ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: StreamBuilder(
-              stream: listCable.getCable().stream,
-              initialData: ActionCableInitial(),
-              builder: (context, AsyncSnapshot<ActionCableDataState> snapshot){
-                  if(snapshot.hasData){
-                    return buildBody(snapshot, context);
-                  }else{
-                    return NoData(Icons.format_list_bulleted, 'No tienes ninguna lista');
-                  }
-      },
+      body: Container(
+        margin: EdgeInsets.only(top: 5),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: StreamBuilder(
+                stream: listCable.getCable().stream,
+                initialData: ActionCableInitial(),
+                builder: (context, AsyncSnapshot<ActionCableDataState> snapshot){
+                    if(snapshot.hasData){
+                      return buildBody(snapshot, context);
+                    }else{
+                      return NoData(Icons.format_list_bulleted, 'No tienes ninguna lista');
+                    }
+        },
     ),
+            ),
+          ],
           ),
-        ],
-        ),
+      ),
         floatingActionButton: FloatingActionButton(
           onPressed: (){ },
           backgroundColor: Colors.blueGrey,
@@ -109,8 +112,8 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
 
   Widget _listaMap(BuildContext context,Map<String, dynamic> listItem, int index){
         return Container(
-            margin: EdgeInsets.symmetric(vertical: 2, horizontal: 5),
-            padding: EdgeInsets.symmetric(vertical: 3, horizontal: 10),
+            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
             child: Card(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                 color: Theme.of(context).cardColor,

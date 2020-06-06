@@ -36,7 +36,7 @@ class _TabUserPageState extends State<TabUserPage> {
         title: Center(child: Text('Ajustes'),),
         contentPadding: EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         content: Container(
-          height: 130,
+          height: 150,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
