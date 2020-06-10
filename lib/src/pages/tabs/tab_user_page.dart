@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:prototipo_super_v2/src/utils/utils.dart';
 import 'package:prototipo_super_v2/src/widgets/switch_dark_widget.dart';
+import 'package:prototipo_super_v2/src/widgets/user_data_widget.dart';
 
 class TabUserPage extends StatefulWidget {
 
@@ -26,7 +27,7 @@ class _TabUserPageState extends State<TabUserPage> {
       body: Stack(
         children: <Widget>[
           _crearFondo(context),
-          
+          _perfil(context),
         ],
       ),
     );
@@ -38,6 +39,7 @@ Widget _crearFondo(BuildContext context){
 
   final fondoSuperior = Container(
     height: size.height*0.2,
+    margin: EdgeInsets.only(left: 10, right: 10, top: 12),
     width: double.infinity,
     child: FadeInImage(
             fit: BoxFit.cover,
@@ -58,88 +60,78 @@ Widget _crearFondo(BuildContext context){
       children: <Widget>[
         fondoSuperior,
 
-        Container(
-          padding: EdgeInsets.only(top: 65,),
-          child: Column(
-            children: <Widget>[
-              CircleAvatar(backgroundColor: Color.fromRGBO(158, 27, 27, 1), child: Text('H',style: TextStyle(fontSize: 75),),radius: 80,
-              foregroundColor: Colors.white),
-              SizedBox(height: 20, width: double.infinity,),
-              Text('Nombre de Usuario', style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 28),),
-              
-              SizedBox(height: 28,),
-
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Container(width: size.width*0.8, height: 36, color: Colors.blueGrey,
-                alignment: Alignment.center,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                  Icon(Icons.shopping_cart, color: Colors.white,),
-                  SizedBox(width: 20,),
-                  Text('Tienes 2 listas disponibles', style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.white),)
-                ],),
-                )),
-
-              SizedBox(height: 20,),  
-            
-              Expanded(
-                  child: Container(
-                    width: size.width*0.8,
-                   // color: Colors.white,
-                    child: Column(children: <Widget>[
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                        Icon(Icons.mail,size: 28, color: Colors.lightBlue,),
-                        SizedBox(width: 20,),
-                        Text('example@example.com', style: Theme.of(context).textTheme.subtitle1,)
-                      ],),
-
-                      SizedBox(height: 10,),
-
-                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                        Icon(Icons.phone_android,size: 28, color: Colors.lightBlue,),
-                        SizedBox(width: 20,),
-                        Text('77448899', style: Theme.of(context).textTheme.subtitle1,)
-                      ],),
-
-                       SizedBox(height: 10,),
-
-                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                        Icon(Icons.people,size: 28, color: Colors.lightBlue,),
-                        SizedBox(width: 20,),
-                        Text('Tienes 24 amigos', style: Theme.of(context).textTheme.subtitle1,)
-                      ],),
-
-                       SizedBox(height: 10,),
-
-                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
-                        Icon(Icons.people_outline,size: 28, color: Colors.lightBlue,),
-                        SizedBox(width: 20,),
-                        Text('Tienes 2 solicitudes de amistad', style: Theme.of(context).textTheme.subtitle1,)
-                      ],),
-                    ],),
-                ),
-              ),
-            ],
-          ),
-        ),
+      
       ],
     );
 
+}
+
+Widget _perfil(BuildContext context){
+  final size = MediaQuery.of(context).size;
+  final isPortrait = MediaQuery.of(context).orientation;
+  bool screenMode = (isPortrait == Orientation.portrait) ? true : false;
+
+  return SingleChildScrollView(
+      child: Column(
+              children: <Widget>[
+                 SafeArea(child: Container(height: (screenMode) ? 60 : 10)),
+
+                CircleAvatar(
+                  backgroundColor: Colors.white, 
+                  child: CircleAvatar(
+                    backgroundColor: Color.fromRGBO(158, 27, 27, 1),
+                    radius: 78,
+                    child: Text('H', style: TextStyle(color: Colors.white, fontSize: 75),),
+                  ),
+                  radius: 80,
+                  foregroundColor: Colors.white
+                ),
+                
+                SizedBox(height: 20, width: double.infinity,),
+                Text('Nombre de Usuario', style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 28),),
+                
+                SizedBox(height: 28,),
+
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(width: size.width*0.8, height: 36, color: Colors.blueGrey,
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                    Icon(Icons.shopping_cart, color: Colors.white,),
+                    SizedBox(width: 20,),
+                    Text('Tienes 2 listas disponibles', style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.white),)
+                  ],),
+                  )),
+
+                SizedBox(height: 20,),
+
+                ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: Container(
+                    width: size.width*0.8,
+                    color: Theme.of(context).cardColor,
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    child: Column(
+                      children: <Widget>[
+                        userData(context, Icons.mail, 'example@example.com'),
+                        SizedBox(height: 10),
+                         userData(context, Icons.phone_iphone, '77559921'),
+                          SizedBox(height: 10),
+                         userData(context, Icons.people, 'Tienes 24 amigos'),
+                          SizedBox(height: 10),
+                         userData(context, Icons.people_outline, 'Tienes 2 solicitudes'),
+                      ],
+                    ),
+                  ),
+                ),  
+              
+                
+              ],
+            ),
+  );
 }
 
 
