@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:prototipo_super_v2/src/models/user_profile_model.dart' as UserProfile;
+import 'package:prototipo_super_v2/src/providers/usuario_provider.dart';
 import 'package:prototipo_super_v2/src/utils/utils.dart';
 import 'package:prototipo_super_v2/src/widgets/switch_dark_widget.dart';
 import 'package:prototipo_super_v2/src/widgets/user_data_widget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TabUserPage extends StatefulWidget {
 
@@ -9,7 +13,32 @@ class TabUserPage extends StatefulWidget {
   _TabUserPageState createState() => _TabUserPageState();
 }
 
-class _TabUserPageState extends State<TabUserPage> {
+class _TabUserPageState extends State<TabUserPage> with AutomaticKeepAliveClientMixin {
+  UsuarioProvider usuario = new UsuarioProvider();
+  SharedPreferences prefs;
+  UserProfile.User u = new UserProfile.User(email: '', phone: '', username: 'f');
+
+
+  @override
+  void initState() {
+    super.initState();
+    initProfile();
+  }
+
+  initProfile() async {
+    prefs = await SharedPreferences.getInstance();
+    u = await usuario.perfil(prefs.getInt('id'), prefs.getString('token'));
+    setState(() {
+      
+    });
+  }
+
+  refreshProfile() async {
+    u = await usuario.perfil(prefs.getInt('id'), prefs.getString('token'));
+    setState(() {
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,10 +50,17 @@ class _TabUserPageState extends State<TabUserPage> {
         actions: <Widget>[
           IconButton(icon: Icon(Icons.settings), onPressed: () {
             settingsModal(context);
-          }, alignment: Alignment.centerLeft,)
+          }, alignment: Alignment.centerLeft,),
         ],
+        leading: IconButton(
+          padding: EdgeInsets.symmetric(horizontal: 10),
+          icon: Icon(Icons.update), onPressed: () {
+            refreshProfile();
+            Fluttertoast.showToast(msg: 'Perfil actualizado!', toastLength: Toast.LENGTH_SHORT);
+          }, alignment: Alignment.center,),
       ),
-      body: Stack(
+      body: (u.email.isEmpty || u.phone.isEmpty) ? Center(child: CircularProgressIndicator(),) : 
+      Stack(
         children: <Widget>[
           _crearFondo(context),
           _perfil(context),
@@ -74,21 +110,21 @@ Widget _perfil(BuildContext context){
   return SingleChildScrollView(
       child: Column(
               children: <Widget>[
-                 SafeArea(child: Container(height: (screenMode) ? 60 : 10)),
+                 SafeArea(child: Container(height: (screenMode) ? 80 : 10)),
 
                 CircleAvatar(
                   backgroundColor: Colors.white, 
                   child: CircleAvatar(
                     backgroundColor: Color.fromRGBO(158, 27, 27, 1),
-                    radius: 78,
-                    child: Text('H', style: TextStyle(color: Colors.white, fontSize: 75),),
+                    radius: 62,
+                    child: Text('${u.username[0].toUpperCase()}', style: TextStyle(color: Colors.white, fontSize: 64),),
                   ),
-                  radius: 80,
+                  radius: 64,
                   foregroundColor: Colors.white
                 ),
                 
                 SizedBox(height: 20, width: double.infinity,),
-                Text('Nombre de Usuario', style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 28),),
+                Text('${u.username}', style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 28),),
                 
                 SizedBox(height: 28,),
 
@@ -102,7 +138,7 @@ Widget _perfil(BuildContext context){
                     children: <Widget>[
                     Icon(Icons.shopping_cart, color: Colors.white,),
                     SizedBox(width: 20,),
-                    Text('Tienes 2 listas disponibles', style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.white),)
+                    Text('Tienes ${u.lists.length} listas disponibles', style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.white),)
                   ],),
                   )),
 
@@ -116,9 +152,9 @@ Widget _perfil(BuildContext context){
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     child: Column(
                       children: <Widget>[
-                        userData(context, Icons.mail, 'example@example.com'),
+                        userData(context, Icons.mail, '${u.email}'),
                         SizedBox(height: 10),
-                         userData(context, Icons.phone_iphone, '77559921'),
+                         userData(context, Icons.phone_iphone, '${u.phone}'),
                           SizedBox(height: 10),
                          userData(context, Icons.people, 'Tienes 24 amigos'),
                           SizedBox(height: 10),
@@ -175,6 +211,9 @@ Widget _perfil(BuildContext context){
     }, 
   );
 }
+
+  @override
+  bool get wantKeepAlive => true;
 
 
 }

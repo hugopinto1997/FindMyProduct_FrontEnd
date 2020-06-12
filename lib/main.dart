@@ -24,7 +24,8 @@ Future<void> main() async {
   pagina = prefs.getString('token') ?? '';
   temaActivo = prefs.getBool('dark') ?? false;
   loggedUser = prefs.getInt('id');
-  try{
+
+  try {
     cameras = await availableCameras();
   } on CameraException catch (e) {
     print('Error: $e.code\nError Message: $e.message');
