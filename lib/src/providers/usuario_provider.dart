@@ -1,7 +1,8 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:prototipo_super_v2/src/models/user_model.dart';
+import 'package:prototipo_super_v2/src/models/user_model.dart' as User;
+import 'package:prototipo_super_v2/src/models/user_profile_model.dart' as UserProfile;
 
 
 class UsuarioProvider {
@@ -28,7 +29,7 @@ class UsuarioProvider {
     }
   }
 
- Future<Map<String, dynamic>> register(User usuario) async {
+ Future<Map<String, dynamic>> register(User.User usuario) async {
    final direccion = Uri.https(
       'findmyproduct-api.herokuapp.com',
       'api/v1/users.json', 
@@ -52,5 +53,23 @@ class UsuarioProvider {
       return {'error': token['error']};
     }*/
   }
+
+Future<UserProfile.User> perfil(int userId, String accessToken) async {
+
+    final direccionUrl = 'https://findmyproduct-api.herokuapp.com/api/v1/users/$userId.json';
+
+  final resp = await http.get(direccionUrl, 
+  headers: {
+    'authorization': accessToken,
+  });
+
+  final decodedData = json.decode(resp.body);
+
+  final usuario = UserProfile.User.fromJson(decodedData["user"]);
+
+  print(usuario.username);  
+  return usuario;
+}
+
 
 }

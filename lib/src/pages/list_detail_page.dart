@@ -304,7 +304,7 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
       actionPane: SlidableDrawerActionPane(),
       actions: <Widget>[
         IconSlideAction(
-          caption: 'Eliminar',
+          caption: 'Editar',
           color: Colors.green,
           icon: Icons.edit,
           onTap: () {},

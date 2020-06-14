@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:prototipo_super_v2/src/bloc/login_bloc.dart';
+import 'package:prototipo_super_v2/src/pages/add_friends_page.dart';
 import 'package:prototipo_super_v2/src/pages/home_page.dart';
 import 'package:prototipo_super_v2/src/pages/list_detail_page.dart';
 import 'package:prototipo_super_v2/src/pages/login_page.dart';
 import 'package:prototipo_super_v2/src/pages/register_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_camera_page.dart';
+import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,16 +17,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 List<CameraDescription> cameras;
 SharedPreferences prefs;
 String pagina;
-bool temaActivo;
+bool currentTheme;
 int loggedUser;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   prefs = await SharedPreferences.getInstance();
   pagina = prefs.getString('token') ?? '';
-  temaActivo = prefs.getBool('dark') ?? false;
+  currentTheme = prefs.getBool('dark') ?? false;
   loggedUser = prefs.getInt('id');
-  try{
+
+  try {
     cameras = await availableCameras();
   } on CameraException catch (e) {
     print('Error: $e.code\nError Message: $e.message');
@@ -39,8 +42,9 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider(create: (_) => LoginBloc()),
         Provider(create: (_) => ListsActionCableProvider(loggedUser)),
+        Provider(create: (_) => FriendsProvider(pagina)),
         ChangeNotifierProvider(
-          create: (_) => ThemeProvider(temaActivo),
+          create: (_) => ThemeProvider(currentTheme),
         ),
       ],
       child: _MaterialChild()
@@ -64,6 +68,7 @@ class _MaterialChild extends StatelessWidget {
         'home': (BuildContext context) => HomePage(cameras),
         'camara': (BuildContext context) => TabCameraPage(cameras),
         'listDetail': (BuildContext context) => ListDetail(ctx: context,),
+        'add_friends': (BuildContext context) => AddFriendsPage(ctx: context,),
       },
       theme: theme.getTheme(),
     );
