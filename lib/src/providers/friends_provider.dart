@@ -10,10 +10,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FriendsProvider {
 
   String token;
+  SharedPreferences _prefs;
 
   FriendsProvider(String t){
     token = t;
   }
+
+
+
+setPrefs(String t){
+  token = t;
+}
+
+
 
 Future<List<User>> allUsers() async {
 
@@ -32,7 +41,7 @@ Future<List<User>> allUsers() async {
   return usuarios.users;  
 }
 
-Future<String> createFriendship(int fi) async {
+Future<Map<String, String>> createFriendship(int fi) async {
 
     final direccion = Uri.https(
       'findmyproduct-api.herokuapp.com',
@@ -48,12 +57,12 @@ Future<String> createFriendship(int fi) async {
   });
 
   final decodedData = json.decode(resp.body);
-
+  
   print(decodedData['message']);
-  return decodedData['message'].toString();
+  return {'resp': decodedData['message'].toString()};
 }
 
-Future allFriends() async {
+Future<List> allFriends() async {
 
     final direccionUrl = 'https://findmyproduct-api.herokuapp.com/api/v1/users/friendships.json';
 
@@ -62,10 +71,71 @@ Future allFriends() async {
     'authorization': token,
   });
 
+  List friends = new List();
+
   final decodedData = json.decode(resp.body);
 
-  print(decodedData);
-  //return decodedData['message'].toString();
+   friends.addAll(decodedData['friends']);
+   friends.addAll(decodedData['inverse_friends']);
+
+  //print(friends[0]['username']);
+  return friends;
+}
+
+Future<List> friendRequests() async {
+
+    final direccionUrl = 'https://findmyproduct-api.herokuapp.com/api/v1/users/friendships.json';
+
+  final resp = await http.get(direccionUrl, 
+  headers: {
+    'authorization': token,
+  });
+
+  List friends = new List();
+
+  final decodedData = json.decode(resp.body);
+
+   friends.addAll(decodedData['friend_requests']);
+
+  //print(friends[0]['username']);
+  return friends;
+}
+
+Future<String> acceptRequest(String rid, String uid) async {
+final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/users/friendships/$rid.json', 
+      {
+        'friend_id': uid
+      }
+    );
+
+
+  final resp = await http.patch(direccion, 
+  headers: {
+    'authorization': token,
+  });
+
+  final decodedData = json.decode(resp.body);
+
+  //print(friends[0]['username']);
+  return decodedData['message'].toString();
+}
+
+
+Future<String> deleteRequest(String rid) async {
+
+   final direccionUrl = 'https://findmyproduct-api.herokuapp.com/api/v1/users/friendships/$rid.json';
+
+  final resp = await http.delete(direccionUrl, 
+  headers: {
+    'authorization': token,
+  });
+
+  final decodedData = json.decode(resp.body);
+
+  //print(friends[0]['username' ]);
+  return decodedData['message'].toString();
 }
 
 }

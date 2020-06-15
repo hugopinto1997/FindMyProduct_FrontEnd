@@ -2,8 +2,10 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/models/user_model.dart';
+import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
 import 'package:prototipo_super_v2/src/providers/usuario_provider.dart';
 import 'package:prototipo_super_v2/src/utils/utils.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -291,6 +293,7 @@ Widget _crearBotonRegister(BuildContext context){
 void _submit(BuildContext context) async {
     final usuarioProvider = new UsuarioProvider();
     final prefs = await SharedPreferences.getInstance();
+    final friendsProvider = Provider.of<FriendsProvider>(context, listen: false);
     
 
   if( formKey.currentState.validate() ){
@@ -303,6 +306,7 @@ void _submit(BuildContext context) async {
     if(entra2.containsKey('token')){
       prefs.setString('token', entra2['token']);
       prefs.setInt('id', entra2['id']);
+      friendsProvider.setPrefs(entra['token']);
       Navigator.of(context).popUntil((route) => route.isFirst);
       Navigator.pushReplacementNamed(context, 'home');
     Fluttertoast.showToast(msg: '${entra['resp']['status']}', toastLength: Toast.LENGTH_LONG);

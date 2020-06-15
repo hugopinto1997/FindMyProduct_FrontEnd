@@ -30,6 +30,7 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
         ],
       ),
       body: Container(
+        padding: EdgeInsets.only(top: 10),
         child: Column(
           children: <Widget>[
             Expanded(child: _buildFriends(context, friendsProvider)),
@@ -77,9 +78,9 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
               child: ListTile(
-              onTap: () { 
-                final r = fp.createFriendship(u.id);
-                Fluttertoast.showToast(msg: r.toString(), toastLength: Toast.LENGTH_LONG);
+              onTap: () async { 
+                final Map<String, String> r = await fp.createFriendship(u.id);
+                Fluttertoast.showToast(msg: r['resp'], toastLength: Toast.LENGTH_LONG);
                 Navigator.of(context).pop();
                },
               leading: CircleAvatar(
@@ -95,6 +96,8 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
       ),
     );
   }
+
+  
 
 
 
