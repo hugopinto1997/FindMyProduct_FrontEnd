@@ -35,5 +35,31 @@ class ProductsProvider{
   }
 
 
+  Future<String> setCheck(String id, String name) async {
+    final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/listproducts/check.json', 
+      {
+        'id': id,
+        'name': name,
+      }
+    );
+
+  final resp = await http.post(direccion, 
+  headers: {
+    'authorization': _token,
+  });
+
+  //List products = new List();
+
+  final decodedData = json.decode(resp.body);
+
+  //products.addAll(decodedData['products']);
+
+  //print(products);
+  return decodedData.toString();
+  }
+
+
 
 }

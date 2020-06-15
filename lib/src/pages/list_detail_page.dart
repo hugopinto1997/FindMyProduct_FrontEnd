@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'package:fluttertoast/fluttertoast.dart';
+
 
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
+import 'package:prototipo_super_v2/src/providers/products_provider.dart';
 import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +19,9 @@ ListDetail({@required this.ctx});
   _ListDetailState createState() => _ListDetailState();
 }
 
-class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
+class _ListDetailState extends State<ListDetail>{
+   final formKey = GlobalKey<FormState>();
+  String _descripcion, _cantidad;
   Map<String, dynamic> _listItem;
   Map<String, dynamic> argumentos;
   int identificador;
@@ -24,12 +29,7 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
   int cantidadProductos;
 
 
-  List<String> _fotos = [
-    'https://www.postconsumerbrands.com/wp-content/uploads/2019/11/Post_Hostess_Twinkies_Cereal_Box.jpg?fbclid=IwAR01YBS7woWDTmk2CZt_klrvI3NWT0c65pQAUBiTCyG2f3QLrcY9BrN_EMw',
-    'https://www.nestle-centroamerica.com/sites/g/files/pydnoa521/files/asset-library/publishingimages/marcas/musun1.jpg',
-    'https://static.wixstatic.com/media/32e401_840022c67be64ed68a33b34a4e9eae84~mv2.png/v1/fit/w_500,h_500,q_90/file.png',
-  ];
-
+  
 
   @override
   void initState() { 
@@ -50,7 +50,7 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
     argumentos = ModalRoute.of(context).settings.arguments;
     _listItem = argumentos['listItem'];
     identificador = argumentos['index'];
-    print(identificador);
+    //print(identificador);
     return Scaffold(
         body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBool){
@@ -83,8 +83,10 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
         heroTag: 'boton_agregar',
         child: Icon(Icons.add, color: Colors.white,),
         backgroundColor: Colors.blue,
-        onPressed: (){ 
-          Navigator.pushNamed(context, 'add_product');
+        onPressed: () { 
+         Navigator.pushNamed(context, 'add_product', arguments: {'listItem': _listItem}).then((value) { setState(() {
+           
+         });});
         }),
     );
   }
@@ -289,12 +291,7 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
     }
   }
 
-  @override
-  void detach() {
-  }
 
-  @override
-  bool get keptAlive => true;
 
 
 
@@ -303,6 +300,7 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
 
 
 Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
+  final productsProvider = Provider.of<ProductsProvider>(context);
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actions: <Widget>[
@@ -310,7 +308,7 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
           caption: 'Editar',
           color: Colors.green,
           icon: Icons.edit,
-          onTap: () {},
+          onTap: () {addProduct(context, '${product['product_name']}','${product['product_descripcion']}', '${product['product_quantity']}');},
         )
       ],
       secondaryActions: <Widget>[
@@ -333,14 +331,17 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
             children: <Widget>[
               Text('Cant.', style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 16),),
               SizedBox(height: 0,),
-              Text('5', style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 20),),
+              Text('${product['product_quantity']}', style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 20),),
           ],),
           title: Text('${product['product_name']}', style: Theme.of(context).textTheme.title,),
           subtitle: (product['product_descripcion'] == null) ? Text('Sin descripción', style: Theme.of(context).textTheme.subtitle1,) : Text('${product['product_descripcion']}',  style: Theme.of(context).textTheme.subtitle1,),
-          value: (product['product_status'] == null) ? true : product['product_status'],
-          onChanged: (newValue) {
-                
-              },
+          value: (product['product_status'] != false) ? true : product['product_status'],
+          onChanged: (newValue) async {
+            final r = await productsProvider.setCheck(_listItem['id'].toString(), product['product_name']);
+            setState(() {
+              
+            });
+        },
         ),
       ),
     );
@@ -368,4 +369,127 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
   }
 
 
+
+
+  void addProduct(BuildContext context,String product_name, String description, String quantity){
+  final size = MediaQuery.of(context).size;
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        title: Text('Editará de \'${_listItem['name']}\' el producto $product_name'),
+        content: Container(
+            height: size.height*0.35,
+            child: productForm(context, product_name, description, quantity),
+        ),
+        actions: <Widget>[
+          FlatButton(child: Text('Cerrar'), onPressed: () => Navigator.of(context).pop(),),
+        ],
+      );
+    }, 
+  );
+}
+
+Widget productForm(BuildContext context, String name, String description, String quantity){
+  return Column(
+    children: <Widget>[
+      Form(
+        key: formKey,
+        child: Column(
+          children: <Widget>[
+            _createDescription(description),
+            SizedBox(height: 10,),
+            _createQuantity(quantity),
+            SizedBox(height: 30,),
+            _createButton(context, name),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _createDescription(String desc){
+   return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+       child: TextFormField(
+         keyboardType: TextInputType.text,
+         maxLines: 2,
+         initialValue: desc,
+         decoration: InputDecoration(
+         icon: Icon(Icons.description, color: Colors.blue,),
+         hintText: 'Descripción',
+         labelText: 'Descripción del producto',
+          //counterText: snapshot.data,
+          //errorText: snapshot.error,
+            ),
+         onSaved: (d) => _descripcion = d,
+         validator: (value){
+            if (value.length == 0) { return 'La descripción no puede ir vacía'; 
+            }else { return null; }
+         },
+          ),
+        );
+}
+
+Widget _createQuantity(String q){
+   return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20),
+       child: TextFormField(
+         keyboardType: TextInputType.number,
+         maxLines: 1,
+         initialValue: q,
+         decoration: InputDecoration(
+         icon: Icon(Icons.add_to_photos, color: Colors.blue,),
+         hintText: 'Cantidad',
+         labelText: 'Cantidad del producto',
+          //counterText: snapshot.data,
+          //errorText: snapshot.error,
+            ),
+         onSaved: (c) => _cantidad = c,
+         validator: (value){
+            if (value.length == 0) { return 'La cantidad no puede ir vacía'; 
+            }else if(value == '0'){
+              return 'La cantidad no puede ser 0';
+            }
+            else { return null; }
+         },
+          ),
+        );
+}
+
+Widget _createButton(BuildContext context, String name){
+
+     return RaisedButton(
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            child: Text('Guardar cambios')
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 0.0,
+          color: Colors.indigo,
+          textColor: Colors.white,
+          onPressed: () { _submit(context, name); },
+        );
+  }
+
+  _submit(BuildContext context, String p_name) async {
+    final listProvider = Provider.of<ListsActionCableProvider>(context, listen: false);
+
+    if(formKey.currentState.validate()){
+      formKey.currentState.save();
+      final r = await listProvider.editProduct(_listItem['id'], p_name, _descripcion, _cantidad);
+      Navigator.pop(context);
+      //final resp = await listProvider.addProduct(_listItem['id'], p_name , _descripcion, _cantidad);
+     
+    }
+
+  }
+
+
+}
+
+class Fluttertoast {
 }

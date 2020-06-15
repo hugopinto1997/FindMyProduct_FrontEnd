@@ -77,6 +77,53 @@ class ListsActionCableProvider {
     return decodedData['message'].toString();
   }
 
+  Future<String> addProduct(int id, String name, String description, String quantity) async {
+      final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/listproducts/add.json', 
+      {
+        'id': id.toString(),
+        'name': name,
+        'description': description,
+        'quantity': quantity
+      }
+    );
+
+    final resp = await http.post(direccion, 
+    headers: {
+      'authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData);
+    return decodedData['message'].toString();
+  }
+
+  Future<String> editProduct(int id, String name, String description, String quantity) async {
+      final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/listproducts/$id.json', 
+      {
+        'name': name,
+        'quantity': quantity,
+        'description': description
+      }
+    );
+
+    final resp = await http.patch(direccion, 
+    headers: {
+      'authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData);
+    return decodedData['message'].toString();
+  }
+
+
+
 
 
 

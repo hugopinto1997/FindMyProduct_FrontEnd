@@ -4,6 +4,7 @@ import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
+import 'package:prototipo_super_v2/src/providers/products_provider.dart';
 import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -128,7 +129,10 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                     child: ListTile(
-                    onTap: () { Navigator.pushNamed(context, 'listDetail', arguments: {'listItem': listItem, 'index': index}); },
+                    onTap: () { Navigator.pushNamed(context, 'listDetail', arguments: {'listItem': listItem, 'index': index}).then((value) {setState(() {
+                      
+                    });});
+                    },
                     leading: Icon(Icons.shopping_cart, color: Colors.indigo, size: 48),
                     title: Text(listItem['name'], style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
                     subtitle:  Text('Productos seleccionados: ${listItem['products'].length}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
