@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'package:action_cable_stream/action_cable_stream.dart';
 import 'package:action_cable_stream/action_cable_stream_states.dart';
@@ -9,15 +11,22 @@ class ListsActionCableProvider {
   String actioncableurl = 'wss://findmyproduct-api.herokuapp.com/api/v1/cable';
   SharedPreferences prefs; 
   int userIdentifier;
+  String _token;
   
-  ListsActionCableProvider(int ui){
+  ListsActionCableProvider(int ui, String tk){
     userIdentifier = ui;
+    _token = tk;
     initCable();
   }
 
   initPrefs() async {
     prefs = await SharedPreferences.getInstance();
     userIdentifier = prefs.getInt("id");
+  }
+
+  setToken(String t, int isd){
+    _token = t;
+    userIdentifier = isd;
   }
 
   initCable(){
@@ -44,5 +53,31 @@ class ListsActionCableProvider {
   }
 
   ActionCable getCable() => this._cable2;
+
+
+
+  Future<String> createList(String name) async {
+    initCable();
+      final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/lists.json', 
+      {
+        'list[name]': name
+      }
+    );
+
+    final resp = await http.post(direccion, 
+    headers: {
+      'authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData);
+    return decodedData['message'].toString();
+  }
+
+
+
 
 }

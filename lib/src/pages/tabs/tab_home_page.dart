@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
@@ -17,13 +18,16 @@ class TabHomePage extends StatefulWidget {
 class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClientMixin {
 
   ListsActionCableProvider listCable;
-
+  TextEditingController controller;
+  String _texto = '';
 
   @override
   void initState() { 
     super.initState();
+    _texto = '';
     listCable = Provider.of<ListsActionCableProvider>(widget.ctx);
     listCable.initCable();
+    controller = TextEditingController();
   }
 
 @override
@@ -66,7 +70,9 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
           ),
       ),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){ },
+          onPressed: (){ 
+            createList(context, 'aber');
+          },
           backgroundColor: Colors.blueGrey,
           child: Icon(Icons.add, color: Colors.white,),
         ),
@@ -132,6 +138,74 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
               ),
                 );
   }
+
+  createList(BuildContext context, String error){
+    final listProvider = Provider.of<ListsActionCableProvider>(context, listen: false);
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Nueva lista', textAlign: TextAlign.center, style: Theme.of(context).textTheme.title,),
+          content: Container(
+            height: 120,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+               TextField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.shopping_cart, color: Colors.blue,),
+                      hintText: 'Nombre de la lista',
+                      labelText: 'Lista',
+                    ),
+                    onChanged: (t){
+                      setState(() {
+                        _texto = t;
+                      });
+                    },
+                  ), 
+                SizedBox(height: 20,),
+                Expanded(
+                  child: RaisedButton(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                    onPressed: () async {
+                       if(_texto.length > 0 || _texto != ''){
+                         listProvider.createList(_texto);
+                         Navigator.of(context).pop();
+                         controller.clear();
+                         _texto = '';
+                         setState(() {
+                           
+                         });
+                       }else{
+                          Fluttertoast.showToast(msg: 'Este campo no puede ir vacío', toastLength: Toast.LENGTH_LONG);
+                       }
+                        
+                     },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                      Text('Crear lista', style: Theme.of(context).textTheme.title,)
+                    ],), 
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(child: Text('Cerrar'), onPressed: () { 
+              Navigator.of(context).pop(); 
+              controller.clear();
+              },),
+          ],
+        );
+      }, 
+    );
+}
 
   @override
   bool get wantKeepAlive => true;

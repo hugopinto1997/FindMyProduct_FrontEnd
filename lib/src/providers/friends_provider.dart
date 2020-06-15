@@ -10,7 +10,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FriendsProvider {
 
   String token;
-  SharedPreferences _prefs;
 
   FriendsProvider(String t){
     token = t;

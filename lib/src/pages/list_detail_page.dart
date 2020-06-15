@@ -80,9 +80,12 @@ class _ListDetailState extends State<ListDetail> with KeepAliveParentDataMixin{
           ), 
        ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'boton_agregar',
         child: Icon(Icons.add, color: Colors.white,),
         backgroundColor: Colors.blue,
-        onPressed: (){ }),
+        onPressed: (){ 
+          Navigator.pushNamed(context, 'add_product');
+        }),
     );
   }
 

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/bloc/login_bloc.dart';
 import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
+import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
+import 'package:prototipo_super_v2/src/providers/products_provider.dart';
 import 'package:prototipo_super_v2/src/providers/usuario_provider.dart';
 import 'package:prototipo_super_v2/src/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -208,6 +210,8 @@ Widget _loginForm(BuildContext context){
   _login(LoginBloc bloc, BuildContext context) async {
     final usuarioProvider = new UsuarioProvider();
     final friendsProvider = Provider.of<FriendsProvider>(context, listen: false);
+    final listProvider = Provider.of<ListsActionCableProvider>(context, listen: false);
+    final productsProvider = Provider.of<ProductsProvider>(context,listen: false);
     final prefs = await SharedPreferences.getInstance();
     //print("Email: ");
     final Map<String, dynamic> entra = await usuarioProvider.login(bloc.email, bloc.password);
@@ -216,7 +220,9 @@ Widget _loginForm(BuildContext context){
       prefs.setString('token', entra['token']);
       prefs.setInt('id', entra['id']);
       friendsProvider.setPrefs(entra['token']);
-      Fluttertoast.showToast(msg: '${entra['token']}', toastLength: Toast.LENGTH_LONG);
+      listProvider.setToken(entra['token'], entra['id']);
+      productsProvider.setData(entra['id'], entra['token']);
+      Fluttertoast.showToast(msg: 'Iniciando sesión...', toastLength: Toast.LENGTH_LONG);
     }else{
       showModal(context, entra['error']);
     }
