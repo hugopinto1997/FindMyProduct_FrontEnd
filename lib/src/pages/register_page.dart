@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/models/user_model.dart';
 import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
+import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
+import 'package:prototipo_super_v2/src/providers/products_provider.dart';
 import 'package:prototipo_super_v2/src/providers/usuario_provider.dart';
 import 'package:prototipo_super_v2/src/utils/utils.dart';
 import 'package:provider/provider.dart';
@@ -294,7 +296,8 @@ void _submit(BuildContext context) async {
     final usuarioProvider = new UsuarioProvider();
     final prefs = await SharedPreferences.getInstance();
     final friendsProvider = Provider.of<FriendsProvider>(context, listen: false);
-    
+    final listProvider = Provider.of<ListsActionCableProvider>(context, listen: false);
+    final productsProvider = Provider.of<ProductsProvider>(context, listen: false);
 
   if( formKey.currentState.validate() ){
     formKey.currentState.save();
@@ -306,7 +309,9 @@ void _submit(BuildContext context) async {
     if(entra2.containsKey('token')){
       prefs.setString('token', entra2['token']);
       prefs.setInt('id', entra2['id']);
-      friendsProvider.setPrefs(entra['token']);
+      friendsProvider.setPrefs(entra2['token']);
+      listProvider.setToken(entra2['token'], entra2['id']);
+      productsProvider.setData(entra2['id'], entra2['token']);
       Navigator.of(context).popUntil((route) => route.isFirst);
       Navigator.pushReplacementNamed(context, 'home');
     Fluttertoast.showToast(msg: '${entra['resp']['status']}', toastLength: Toast.LENGTH_LONG);
