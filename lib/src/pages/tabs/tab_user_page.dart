@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/models/user_profile_model.dart' as UserProfile;
+import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
 import 'package:prototipo_super_v2/src/providers/usuario_provider.dart';
 import 'package:prototipo_super_v2/src/utils/utils.dart';
 import 'package:prototipo_super_v2/src/widgets/switch_dark_widget.dart';
 import 'package:prototipo_super_v2/src/widgets/user_data_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TabUserPage extends StatefulWidget {
-
+  final BuildContext context;
+  TabUserPage({this.context});
   @override
   _TabUserPageState createState() => _TabUserPageState();
 }
@@ -17,6 +20,8 @@ class _TabUserPageState extends State<TabUserPage> with AutomaticKeepAliveClient
   UsuarioProvider usuario = new UsuarioProvider();
   SharedPreferences prefs;
   UserProfile.User u = new UserProfile.User(email: '', phone: '', username: 'f');
+  List friends, requests;
+  FriendsProvider amigos; 
 
 
   @override
@@ -26,8 +31,11 @@ class _TabUserPageState extends State<TabUserPage> with AutomaticKeepAliveClient
   }
 
   initProfile() async {
+    amigos = Provider.of<FriendsProvider>(widget.context);
     prefs = await SharedPreferences.getInstance();
     u = await usuario.perfil(prefs.getInt('id'), prefs.getString('token'));
+    friends = await amigos.allFriends();
+    requests = await amigos.friendRequests();
     setState(() {
       
     });
@@ -35,6 +43,8 @@ class _TabUserPageState extends State<TabUserPage> with AutomaticKeepAliveClient
 
   refreshProfile() async {
     u = await usuario.perfil(prefs.getInt('id'), prefs.getString('token'));
+    friends = await amigos.allFriends();
+    requests = await amigos.friendRequests();
     setState(() {
     });
   }
@@ -156,9 +166,9 @@ Widget _perfil(BuildContext context){
                         SizedBox(height: 10),
                          userData(context, Icons.phone_iphone, '${u.phone}'),
                           SizedBox(height: 10),
-                         userData(context, Icons.people, 'Tienes 24 amigos'),
+                         userData(context, Icons.people, 'Tienes ${friends.length} amigos'),
                           SizedBox(height: 10),
-                         userData(context, Icons.people_outline, 'Tienes 2 solicitudes'),
+                         userData(context, Icons.people_outline, 'Tienes ${requests.length} solicitudes'),
                       ],
                     ),
                   ),

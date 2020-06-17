@@ -135,7 +135,7 @@ class _Paginas extends StatelessWidget {
         
         TabContactosPage(),
 
-        TabUserPage(),
+        TabUserPage(context: context,),
       ],
     );
   }
