@@ -57,7 +57,7 @@ class ListsActionCableProvider {
 
 
   Future<String> createList(String name) async {
-    initCable();
+      initCable();
       final direccion = Uri.https(
       'findmyproduct-api.herokuapp.com',
       'api/v1/lists.json', 
@@ -78,6 +78,7 @@ class ListsActionCableProvider {
   }
 
   Future<String> addProduct(int id, String name, String description, String quantity) async {
+      //initCable();
       final direccion = Uri.https(
       'findmyproduct-api.herokuapp.com',
       'api/v1/listproducts/add.json', 
@@ -122,6 +123,29 @@ class ListsActionCableProvider {
     return decodedData['message'].toString();
   }
 
+
+
+Future<String> deleteProduct(int id, String name) async {
+      //initCable();
+      final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/listproducts/$id.json', 
+      {
+        'id': id.toString(),
+        'name': name,
+      }
+    );
+
+    final resp = await http.delete(direccion, 
+    headers: {
+      'authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData);
+    return decodedData['message'].toString();
+  }
 
 
 

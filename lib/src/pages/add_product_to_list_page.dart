@@ -144,21 +144,23 @@ void addProduct(BuildContext context,String product_name, String error){
 }
 
 Widget productForm(BuildContext context, String name){
-  return Column(
-    children: <Widget>[
-      Form(
-        key: formKey,
-        child: Column(
-          children: <Widget>[
-            _createDescription(),
-            SizedBox(height: 10,),
-            _createQuantity(),
-            SizedBox(height: 30,),
-            _createButton(context, name),
-          ],
+  return SingleChildScrollView(
+      child: Column(
+      children: <Widget>[
+        Form(
+          key: formKey,
+          child: Column(
+            children: <Widget>[
+              _createDescription(),
+              SizedBox(height: 10,),
+              _createQuantity(),
+              SizedBox(height: 30,),
+              _createButton(context, name),
+            ],
+          ),
         ),
-      ),
-    ],
+      ],
+    ),
   );
 }
 

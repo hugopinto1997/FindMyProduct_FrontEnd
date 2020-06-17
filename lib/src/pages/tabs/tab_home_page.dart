@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:action_cable_stream/action_cable_stream_states.dart';
@@ -101,12 +102,15 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
         if(res.length == 0){
           return NoData(Icons.format_list_bulleted, 'No tienes ninguna lista');
         }else{
-          return ListView.builder(
-           itemCount: res.length ?? 0,
-           itemBuilder: (context, index){
-             return _listaMap(context, res[index], index);
-           },
-         );
+          return RefreshIndicator(
+             onRefresh: refresh,
+             child: ListView.builder(
+             itemCount: res.length ?? 0,
+             itemBuilder: (context, index){
+               return _listaMap(context, res[index], index);
+             },
+         ),
+          );
         }
          
         // return Text('${res[0]}');
@@ -115,6 +119,18 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
     } else {
       return Text('Something went wrong');
     }
+  }
+
+  Future<Null> refresh() async {
+    final duration = new Duration(
+      seconds: 1
+    );
+    Timer(duration, (){
+      setState(() {
+        listCable.initCable();
+      });
+    });
+    return Future.delayed(duration);
   }
 
   Widget _listaMap(BuildContext context,Map<String, dynamic> listItem, int index){
@@ -175,6 +191,8 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                 SizedBox(height: 20,),
                 Expanded(
                   child: RaisedButton(
+                    color: Colors.indigo,
+                    textColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                     onPressed: () async {
                        if(_texto.length > 0 || _texto != ''){
@@ -193,7 +211,7 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                      Text('Crear lista', style: Theme.of(context).textTheme.title,)
+                      Text('Crear lista', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white))
                     ],), 
                   ),
                 ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -26,6 +27,7 @@ class _ListDetailState extends State<ListDetail>{
   Map<String, dynamic> argumentos;
   int identificador;
   ListsActionCableProvider _productsCable;
+  ListsActionCableProvider _productsCable2;
   int cantidadProductos;
 
 
@@ -50,6 +52,7 @@ class _ListDetailState extends State<ListDetail>{
     argumentos = ModalRoute.of(context).settings.arguments;
     _listItem = argumentos['listItem'];
     identificador = argumentos['index'];
+    _productsCable2 = Provider.of<ListsActionCableProvider>(context);
     //print(identificador);
     return Scaffold(
         body: NestedScrollView(
@@ -272,18 +275,21 @@ class _ListDetailState extends State<ListDetail>{
        List<dynamic> res = json.decode(ej['message'])['info'];
        List<dynamic> productos = res[identificador]['products'];
       cantidadProductos = productos.length;
-      if(cantidadProductos == 0){
-        return NoData(Icons.add_shopping_cart, 'Aún no tienes ningún producto en esta lista');
-      }else{
-       return ListView.builder(
-           itemCount: productos.length ?? 0,
-           itemBuilder: (context, index){
-             /*return _crearLista2(context, productos[index]['product_name'].toString() , _fotos[0]);*/
-             return _buildListItem(context,productos[index]);
-           },
-         );
+     /* if(cantidadProductos == 0){
+        return NoData(Icons.add_shopping_cart, 'Aún no tienes ningún producto en esta lista');*/
+      //}else{
+       return RefreshIndicator(
+         onRefresh: refresh2,
+            child: ListView.builder(
+             itemCount: productos.length ?? 0,
+             itemBuilder: (context, index){
+               /*return _crearLista2(context, productos[index]['product_name'].toString() , _fotos[0]);*/
+               return _buildListItem(context,productos[index]);
+             },
+           ),
+       );
         // return Text('${res}');
-      }
+      //}
     } else if (state is ActionCableDisconnected) {
       return Text('Disconnected');
     } else {
@@ -291,7 +297,17 @@ class _ListDetailState extends State<ListDetail>{
     }
   }
 
-
+Future<Null> refresh2() async {
+    final duration = new Duration(
+      seconds: 1
+    );
+    Timer(duration, (){
+      setState(() {
+        _productsCable2.initCable();
+      });
+    });
+    return Future.delayed(duration);
+  }
 
 
 
@@ -301,6 +317,7 @@ class _ListDetailState extends State<ListDetail>{
 
 Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
   final productsProvider = Provider.of<ProductsProvider>(context);
+  final lp = Provider.of<ListsActionCableProvider>(context);
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
       actions: <Widget>[
@@ -316,7 +333,13 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
           caption: 'Eliminar',
           color: Colors.red,
           icon: Icons.delete,
-          onTap: () {},
+          onTap: () async {
+            final d = await lp.deleteProduct(_listItem['id'], product['product_name']);
+            //Fluttertoast.showToast(msg: 'Producto eliminado', toastLength: Toast.LENGTH_LONG);
+            setState(() {
+              
+            });
+          },
         )
       ],
       child: Card(
@@ -338,9 +361,9 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
           value: (product['product_status'] != false) ? true : product['product_status'],
           onChanged: (newValue) async {
             final r = await productsProvider.setCheck(_listItem['id'].toString(), product['product_name']);
-            setState(() {
+            /*setState(() {
               
-            });
+            });*/
         },
         ),
       ),
@@ -380,9 +403,11 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
       return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         title: Text('Editará de \'${_listItem['name']}\' el producto $product_name'),
-        content: Container(
-            height: size.height*0.35,
-            child: productForm(context, product_name, description, quantity),
+        content: SingleChildScrollView(
+                  child: Container(
+              height: size.height*0.35,
+              child: productForm(context, product_name, description, quantity),
+          ),
         ),
         actions: <Widget>[
           FlatButton(child: Text('Cerrar'), onPressed: () => Navigator.of(context).pop(),),
@@ -481,6 +506,7 @@ Widget _createButton(BuildContext context, String name){
     if(formKey.currentState.validate()){
       formKey.currentState.save();
       final r = await listProvider.editProduct(_listItem['id'], p_name, _descripcion, _cantidad);
+     
       Navigator.pop(context);
       //final resp = await listProvider.addProduct(_listItem['id'], p_name , _descripcion, _cantidad);
      
@@ -491,5 +517,3 @@ Widget _createButton(BuildContext context, String name){
 
 }
 
-class Fluttertoast {
-}
