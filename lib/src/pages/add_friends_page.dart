@@ -14,10 +14,11 @@ AddFriendsPage({@required this.ctx});
 }
 
 class _AddFriendsPageState extends State<AddFriendsPage> {
-
+  Map<String, dynamic> _listItem, argumentos;
  
   @override
   Widget build(BuildContext context) {
+   
     final friendsProvider = Provider.of<FriendsProvider>(context);
     return Scaffold(
       appBar: AppBar(

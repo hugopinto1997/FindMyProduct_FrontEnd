@@ -7,6 +7,7 @@ import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/providers/products_provider.dart';
 import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
@@ -51,8 +52,7 @@ class _ListDetailState extends State<ListDetail>{
   Widget build(BuildContext context) {
     argumentos = ModalRoute.of(context).settings.arguments;
     _listItem = argumentos['listItem'];
-    identificador = argumentos['index'];
-    _productsCable2 = Provider.of<ListsActionCableProvider>(context);
+    _productsCable2 = Provider.of<ListsActionCableProvider>(context, listen: false);
     //print(identificador);
     return Scaffold(
         body: NestedScrollView(
@@ -87,9 +87,10 @@ class _ListDetailState extends State<ListDetail>{
         child: Icon(Icons.add, color: Colors.white,),
         backgroundColor: Colors.blue,
         onPressed: () { 
-         Navigator.pushNamed(context, 'add_product', arguments: {'listItem': _listItem}).then((value) { setState(() {
-           
-         });});
+         Navigator.pushNamed(context, 'add_product', arguments: {'listItem': _listItem}).then((value) { 
+         
+         
+         });
         }),
     );
   }
@@ -104,7 +105,9 @@ class _ListDetailState extends State<ListDetail>{
         pinned: true,
         centerTitle: true,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.mode_edit), onPressed: () {},),
+          IconButton(icon: Icon(Icons.mode_edit), onPressed: () {
+            editList(context);
+          },),
         ],
         flexibleSpace: FlexibleSpaceBar(
           centerTitle: true,
@@ -145,7 +148,7 @@ class _ListDetailState extends State<ListDetail>{
               children: <Widget>[
                 Text((listItem['name'] != null) ? '${listItem['name']}' : 'No disponible',
                 style: Theme.of(context).textTheme.title,),
-                 Text('Creada por: Nombre de Usuario',
+                 Text('Creada el: ${listItem['creation'].toString().substring(0,10)} ',
                  overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.subtitle,),
 
@@ -256,10 +259,126 @@ class _ListDetailState extends State<ListDetail>{
   }
 
 
+void editList(BuildContext context){
+  final fp = Provider.of<FriendsProvider>(context, listen: false);
+  final size = MediaQuery.of(context).size;
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        title: Text('Agrega en \'${_listItem['name']}\' los amigos que podrán participar'),
+        content: Container(
+            height: size.height*0.35,
+            width: size.width,
+            child: Column(
+            children: <Widget>[
+              Expanded(child: _buildFriends(context, fp)),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          RaisedButton(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                color: Colors.blueGrey,
+                padding: EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                 // mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                  SizedBox(width: 10,),
+                  Icon(Icons.add, color: Colors.white,),
+                  SizedBox(width: 5,),
+                  Text('Agregar amigo', style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.white),),
+                  SizedBox(width: 15,),
+                ],),  
+                onPressed: (){ 
+                   Navigator.pushNamed(context, 'add_list_friend', arguments: {'listItem': _listItem}).then((value) { setState(() {
+           
+         });});
+                }
+              ),
+          SizedBox(width: 0,),
+          FlatButton(child: Text('Cerrar'), onPressed: () => Navigator.of(context).pop(),)
+        ],
+      );
+    }, 
+  );
+}
+
+Widget _buildFriends(BuildContext context, FriendsProvider fp) {
+    fp.allFriends();
+    return FutureBuilder(
+      future: fp.allFriends(),
+      //initialData: [],
+      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+        if(snapshot.hasData){
+          return _buildUser(context,snapshot.data);
+        } else{
+          return Center(child: CircularProgressIndicator());
+        }
+      },
+    );
+  }
+
+   Widget _buildUser(BuildContext context, List usrs){
+     return RefreshIndicator(
+          onRefresh: refresh4,
+          child: ListView.builder(
+          itemCount: usrs.length,
+          itemBuilder: (context, index){
+            return _userCard(context, usrs[index]);
+          },
+        ),
+     );
+  }
+
+  Future<Null> refresh4() async {
+    final duration = new Duration(
+      seconds: 1
+    );
+    Timer(duration, (){
+      setState(() {
+        
+      });
+    });
+    return Future.delayed(duration);
+  }
+
+  Widget _userCard(BuildContext context,Map u){
+    final fp = Provider.of<FriendsProvider>(context);
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+      padding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+      child: Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+          color: Theme.of(context).cardColor,
+          margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+          elevation: 5.0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+              child: ListTile(
+              onTap: () { 
+                
+               },
+              leading: CircleAvatar(
+                child: Text('${u['username'][0].toString().toUpperCase()}'),
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+              ),
+              title: Text('${u['username']}', style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
+              //subtitle:  Text('${u['username']}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
+              trailing: Icon(Icons.delete_forever, color: Colors.lightBlue, size: 32,),
+        ),
+       ),
+      ),
+    );
+  }
+
   Widget buildBody(AsyncSnapshot<ActionCableDataState> snapshot, BuildContext context) {
     final state = snapshot.data;
 
-    
+
     if (state is ActionCableInitial ||
         state is ActionCableConnectionLoading ||
         state is ActionCableSubscribeLoading) {
@@ -271,24 +390,24 @@ class _ListDetailState extends State<ListDetail>{
     } else if (state is ActionCableSubscriptionRejected) {
       return Center(child: CircularProgressIndicator());
     } else if (state is ActionCableMessage) {
-        final ej = json.decode(jsonEncode(state.message));
-       List<dynamic> res = json.decode(ej['message'])['info'];
-       List<dynamic> productos = res[identificador]['products'];
-      cantidadProductos = productos.length;
-     /* if(cantidadProductos == 0){
-        return NoData(Icons.add_shopping_cart, 'Aún no tienes ningún producto en esta lista');*/
-      //}else{
-       return RefreshIndicator(
-         onRefresh: refresh2,
-            child: ListView.builder(
-             itemCount: productos.length ?? 0,
+             print('vine aqui LIST DETAIL...');
+            
+         final ej = json.decode(jsonEncode(state.message));
+       final res = json.decode(ej['message'])['info'];
+       final r = filterByUser(res, _productsCable);
+
+      List products = listInfo(r);
+       
+          return RefreshIndicator(
+             onRefresh: refresh2,
+             child: ListView.builder(
+             itemCount: products.length ?? 0,
              itemBuilder: (context, index){
-               /*return _crearLista2(context, productos[index]['product_name'].toString() , _fotos[0]);*/
-               return _buildListItem(context,productos[index]);
+               return _buildListItem(context, products[index]);
              },
-           ),
-       );
-        // return Text('${res}');
+         ),
+        );
+        //return Text('${products}');
       //}
     } else if (state is ActionCableDisconnected) {
       return Text('Disconnected');
@@ -296,6 +415,35 @@ class _ListDetailState extends State<ListDetail>{
       return Text('Something went wrong');
     }
   }
+
+List filterByUser(List lista, ListsActionCableProvider lp){
+    List filtered_list = new List();
+    lista.forEach((element) {
+      List users = element['users'];
+      users.forEach((usuario) {
+        Map<String, dynamic> user = usuario;
+        if(user['user_id'] == lp.userIdentifier){
+          filtered_list.add(element);
+        }
+       });
+     });
+    return filtered_list;
+  }
+
+List listInfo(List lista){
+  Map selected_list;
+  lista.forEach((element) {
+    Map<String, dynamic> e = element;
+      if(e['id'] == _listItem['id']){
+        selected_list = e;
+      }
+   });
+   return selected_list['products'];
+}
+
+cargarCosas(ListsActionCableProvider p) async {
+  await p.getUserLists();
+}
 
 Future<Null> refresh2() async {
     final duration = new Duration(
@@ -317,6 +465,7 @@ Future<Null> refresh2() async {
 
 Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
   final productsProvider = Provider.of<ProductsProvider>(context);
+  final listp = Provider.of<ListsActionCableProvider>(context);
   final lp = Provider.of<ListsActionCableProvider>(context);
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
@@ -325,7 +474,9 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
           caption: 'Editar',
           color: Colors.green,
           icon: Icons.edit,
-          onTap: () {addProduct(context, '${product['product_name']}','${product['product_descripcion']}', '${product['product_quantity']}');},
+          onTap: ()  {
+          addProduct(context, '${product['product_name']}','${product['product_descripcion']}', '${product['product_quantity']}');
+          },
         )
       ],
       secondaryActions: <Widget>[
@@ -335,10 +486,7 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
           icon: Icons.delete,
           onTap: () async {
             final d = await lp.deleteProduct(_listItem['id'], product['product_name']);
-            //Fluttertoast.showToast(msg: 'Producto eliminado', toastLength: Toast.LENGTH_LONG);
-            setState(() {
-              
-            });
+            Fluttertoast.showToast(msg: 'Producto eliminado', toastLength: Toast.LENGTH_LONG);
           },
         )
       ],
@@ -361,9 +509,7 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
           value: (product['product_status'] != false) ? true : product['product_status'],
           onChanged: (newValue) async {
             final r = await productsProvider.setCheck(_listItem['id'].toString(), product['product_name']);
-            /*setState(() {
-              
-            });*/
+           
         },
         ),
       ),
@@ -394,7 +540,7 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
 
 
 
-  void addProduct(BuildContext context,String product_name, String description, String quantity){
+void addProduct(BuildContext context,String product_name, String description, String quantity){
   final size = MediaQuery.of(context).size;
   showDialog(
     context: context,
@@ -506,10 +652,8 @@ Widget _createButton(BuildContext context, String name){
     if(formKey.currentState.validate()){
       formKey.currentState.save();
       final r = await listProvider.editProduct(_listItem['id'], p_name, _descripcion, _cantidad);
-     
+      
       Navigator.pop(context);
-      //final resp = await listProvider.addProduct(_listItem['id'], p_name , _descripcion, _cantidad);
-     
     }
 
   }

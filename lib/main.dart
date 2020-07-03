@@ -3,6 +3,7 @@ import 'package:prototipo_super_v2/src/bloc/login_bloc.dart';
 import 'package:prototipo_super_v2/src/pages/add_friends_page.dart';
 import 'package:prototipo_super_v2/src/pages/add_product_to_list_page.dart';
 import 'package:prototipo_super_v2/src/pages/home_page.dart';
+import 'package:prototipo_super_v2/src/pages/list_add_friend_page.dart';
 import 'package:prototipo_super_v2/src/pages/list_detail_page.dart';
 import 'package:prototipo_super_v2/src/pages/login_page.dart';
 import 'package:prototipo_super_v2/src/pages/register_page.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider(create: (_) => LoginBloc()),
-        Provider(create: (_) => ListsActionCableProvider(loggedUser, pagina)),
+        ChangeNotifierProvider(create: (_) => ListsActionCableProvider(loggedUser, pagina)),
         Provider(create: (_) => FriendsProvider(pagina)),
         Provider(create: (_) => ProductsProvider(loggedUser, pagina),),
         ChangeNotifierProvider(
@@ -73,6 +74,7 @@ class _MaterialChild extends StatelessWidget {
         'listDetail': (BuildContext context) => ListDetail(ctx: context,),
         'add_friends': (BuildContext context) => AddFriendsPage(ctx: context,),
         'add_product': (BuildContext context) => AddProductToListPage(ctx: context,),
+        'add_list_friend': (BuildContext context) => ListAddFriend(),
       },
       theme: theme.getTheme(),
     );

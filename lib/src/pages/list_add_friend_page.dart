@@ -4,28 +4,35 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/models/user_model.dart';
 import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
+import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/widgets/no_data_widget.dart';
 import 'package:provider/provider.dart';
 
-class TabContactosPage extends StatefulWidget {
+class ListAddFriend extends StatefulWidget {
 
   @override
-  _TabContactosPageState createState() => _TabContactosPageState();
+  _ListAddFriendState createState() => _ListAddFriendState();
 }
 
-class _TabContactosPageState extends State<TabContactosPage> with AutomaticKeepAliveClientMixin {
+class _ListAddFriendState extends State<ListAddFriend> {
+  Map<String, dynamic> _listItem, argumentos;
+
+
+
+
   @override
   Widget build(BuildContext context) {
     final friendsProvider = Provider.of<FriendsProvider>(context);
-    //friendsProvider.allFriends();
+     argumentos = ModalRoute.of(context).settings.arguments;
+    _listItem = argumentos['listItem'];
     return Scaffold(
       appBar: AppBar(
-        title: Text('Contactos', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white)),
-        centerTitle: true,
+        title: Text('Agregar amigo', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white)),
+        centerTitle: false,
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.search), onPressed: () {}, alignment: Alignment.centerLeft,),
+          //IconButton(icon: Icon(Icons.search), onPressed: () {}, alignment: Alignment.centerLeft,),
         ],
       ),
       body: Container(
@@ -36,16 +43,10 @@ class _TabContactosPageState extends State<TabContactosPage> with AutomaticKeepA
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'btn-contacts',
-        onPressed: (){ Navigator.pushNamed(context, 'add_friends'); },
-        child: Icon(Icons.group_add, color: Colors.white,),
-        backgroundColor: Colors.blueGrey,
-      ),
     );
   }
 
-  Widget _buildFriends(BuildContext context, FriendsProvider fp) {
+Widget _buildFriends(BuildContext context, FriendsProvider fp) {
     fp.allFriends();
     return FutureBuilder(
       future: fp.allFriends(),
@@ -98,7 +99,7 @@ class _TabContactosPageState extends State<TabContactosPage> with AutomaticKeepA
             borderRadius: BorderRadius.circular(20),
               child: ListTile(
               onTap: () { 
-                
+                  _agregarAmigo(context, u['user_id'], u['username']);
                },
               leading: CircleAvatar(
                 child: Text('${u['username'][0].toString().toUpperCase()}'),
@@ -107,17 +108,42 @@ class _TabContactosPageState extends State<TabContactosPage> with AutomaticKeepA
               ),
               title: Text('${u['username']}', style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
               //subtitle:  Text('${u['username']}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
-              trailing: Icon(Icons.more_vert, color: Colors.lightBlue, size: 32,),
+              trailing: Icon(Icons.add, color: Colors.lightBlue, size: 32,),
         ),
        ),
       ),
     );
   }
 
-  @override
-  bool get wantKeepAlive => true;
 
+_agregarAmigo(BuildContext context, int userid, String username) {
+  final listProvider = Provider.of<ListsActionCableProvider>(context, listen: false);
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        title: Text('¿Estás seguro?'),
+        content: Text('Deseas agregar a $username a la lista ${_listItem['name']}'),
+        actions: <Widget>[
+          FlatButton(child: Text('Agregar a la lista'), 
+          onPressed: () {
+            //Fluttertoast.showToast(msg: '${_listItem['id']} \n $username  ', toastLength: Toast.LENGTH_LONG);
+           addUser(userid, _listItem['name'].toString(), listProvider);
+           Navigator.of(context).pop();
+           Navigator.of(context).pop();
+          }),
+          FlatButton(child: Text('Cerrar'), onPressed: () => Navigator.of(context).pop(),),
+        ],
+      );
+    }, 
+  );
+}
 
+addUser(int listId, String username, ListsActionCableProvider listProv) async{
+  final r = await listProv.addFriend(listId, username);
+  //print('simon');
+}
 
 
 }

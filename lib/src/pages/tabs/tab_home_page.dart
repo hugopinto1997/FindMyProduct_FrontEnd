@@ -24,10 +24,12 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
   String _texto = '';
 
   @override
-  void initState() { 
+  void initState() {
+    print('inicializado HOME PAGE...'); 
     super.initState();
     _texto = '';
     listCable = Provider.of<ListsActionCableProvider>(widget.ctx);
+    //listCable.getUserLists();
     listCable.initCable();
     controller = TextEditingController();
   }
@@ -44,6 +46,7 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
     listCable = Provider.of<ListsActionCableProvider>(context);
+   // print('Building HOME PAGE...');
     return Scaffold(
       appBar: AppBar(
         title: Text('Tus listas', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white),),
@@ -61,7 +64,7 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                 initialData: ActionCableInitial(),
                 builder: (context, AsyncSnapshot<ActionCableDataState> snapshot){
                     if(snapshot.hasData){
-                      return buildBody(snapshot, context);
+                      return buildBody(snapshot, context, listCable);
                     }else{
                       return NoData(Icons.format_list_bulleted, 'No tienes ninguna lista');
                     }
@@ -81,9 +84,8 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
     );
   }
 
- Widget buildBody(AsyncSnapshot<ActionCableDataState> snapshot, BuildContext context) {
+ Widget buildBody(AsyncSnapshot<ActionCableDataState> snapshot, BuildContext context, ListsActionCableProvider listProvider)  {
     final state = snapshot.data;
-
     
     if (state is ActionCableInitial ||
         state is ActionCableConnectionLoading ||
@@ -96,29 +98,47 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
     } else if (state is ActionCableSubscriptionRejected) {
       return Center(child: CircularProgressIndicator());
     } else if (state is ActionCableMessage) {
+       print('vine aqui HOME...');
        final ej = json.decode(jsonEncode(state.message));
        List<dynamic> res = json.decode(ej['message'])['info'];
-       
-        if(res.length == 0){
-          return NoData(Icons.format_list_bulleted, 'No tienes ninguna lista');
-        }else{
+       //Map<String, dynamic> mapa = res[0]['users'][0];
+       List r = filterByUser(res, listProvider);
+
           return RefreshIndicator(
              onRefresh: refresh,
              child: ListView.builder(
-             itemCount: res.length ?? 0,
+             itemCount: r.length ?? 0,
              itemBuilder: (context, index){
-               return _listaMap(context, res[index], index);
+               return _listaMap(context, r[index], index);
              },
          ),
-          );
-        }
-         
-        // return Text('${res[0]}');
+        );
+        //print(prods);       
+       // return Text('${r}');
     } else if (state is ActionCableDisconnected) {
       return Text('Disconnected');
     } else {
       return Text('Something went wrong');
     }
+  }
+
+  List filterByUser(List lista, ListsActionCableProvider lp){
+    List filtered_list = new List();
+    lista.forEach((element) {
+      List users = element['users'];
+      users.forEach((usuario) {
+        Map<String, dynamic> user = usuario;
+        if(user['user_id'] == lp.userIdentifier){
+          filtered_list.add(element);
+        }
+       });
+     });
+    return filtered_list;
+  }
+
+  Future<List> cargar(ProductsProvider p) async{
+    final List resp = await p.getAllProducts();
+    return resp;
   }
 
   Future<Null> refresh() async {
@@ -134,6 +154,7 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
   }
 
   Widget _listaMap(BuildContext context,Map<String, dynamic> listItem, int index){
+    final lp = Provider.of<ListsActionCableProvider>(context, listen: false);
         return Container(
             margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
             padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
@@ -145,9 +166,14 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                     child: ListTile(
-                    onTap: () { Navigator.pushNamed(context, 'listDetail', arguments: {'listItem': listItem, 'index': index}).then((value) {setState(() {
-                      
-                    });});
+                    onTap: () { 
+                      Navigator.pushNamed(context, 'listDetail', arguments: {'listItem': listItem, 'index': index}).then((value) {
+                     if(value == null){
+                       print('se mamo');
+                       
+                     }
+                    });
+                    print(listItem['id']);
                     },
                     leading: Icon(Icons.shopping_cart, color: Colors.indigo, size: 48),
                     title: Text(listItem['name'], style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
@@ -196,12 +222,13 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
                     onPressed: () async {
                        if(_texto.length > 0 || _texto != ''){
-                         listProvider.createList(_texto);
+                         await listProvider.createList(_texto);
                          Navigator.of(context).pop();
                          controller.clear();
                          _texto = '';
-                         setState(() {
-                           
+                         await listProvider.getUserLists();
+                         setState(()  {
+                           //await listProvider.initCable();
                          });
                        }else{
                           Fluttertoast.showToast(msg: 'Este campo no puede ir vacío', toastLength: Toast.LENGTH_LONG);
