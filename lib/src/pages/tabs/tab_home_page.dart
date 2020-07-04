@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/providers/products_provider.dart';
@@ -155,11 +156,23 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
 
   Widget _listaMap(BuildContext context,Map<String, dynamic> listItem, int index){
     final lp = Provider.of<ListsActionCableProvider>(context, listen: false);
-        return Container(
-            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+    final x = Slidable(
+      actionPane: SlidableDrawerActionPane(),
+      secondaryActions: <Widget>[
+        IconSlideAction(
+          caption: 'Eliminar',
+          color: Colors.red,
+          icon: Icons.delete,
+          onTap: () async {
+            await lp.deleteList(listItem['id']);
+            Fluttertoast.showToast(msg: 'Lista eliminada exitosamente', toastLength: Toast.LENGTH_LONG);
+          },
+        )
+      ],
+      child:Container(
+            margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
             child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                 color: Theme.of(context).cardColor,
                 margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                 elevation: 5.0,
@@ -182,7 +195,26 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                   ),
                 ),
               ),
-                );
+                ) ,
+    );
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 2,
+                  spreadRadius: 1,
+                  offset: Offset(0.0, 5.0),
+                ),
+        ],
+      ),
+      margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.0),
+              child: x,
+      ),
+    );
   }
 
   createList(BuildContext context, String error){

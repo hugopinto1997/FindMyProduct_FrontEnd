@@ -87,6 +87,19 @@ class ListsActionCableProvider with ChangeNotifier {
     return decodedData['message'].toString();
   }
 
+Future deleteList(int listId) async {
+      final direccion = 'https://findmyproduct-api.herokuapp.com/api/v1/lists/$listId.json';
+
+    final resp = await http.delete(direccion, 
+    headers: {
+      'authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData.toString());
+  }
+
   Future<String> addProduct(int id, String name, String description, String quantity) async {
       //initCable();
       final direccion = Uri.https(
@@ -259,5 +272,25 @@ Future<List> listFriends(int list_id) async {
   return usuarios;
 }
 
+
+Future<String> deleteFriendFromList(int list, String username) async {
+      final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/listusers/$list', 
+      {
+        'name': username
+      }
+    );
+
+    final resp = await http.delete(direccion, 
+    headers: {
+      'Authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData);
+    return decodedData.toString();
+  }
 
 }

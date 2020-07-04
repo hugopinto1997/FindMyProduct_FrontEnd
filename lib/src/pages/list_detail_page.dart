@@ -29,8 +29,9 @@ class _ListDetailState extends State<ListDetail>{
   int identificador;
   ListsActionCableProvider _productsCable;
   ListsActionCableProvider _productsCable2;
-  int cantidadProductos;
+  int cantidadProductos, _participantes = 1;
   StateSetter _estadoModal;
+  bool ref = false;
 
 
   
@@ -40,6 +41,17 @@ class _ListDetailState extends State<ListDetail>{
     super.initState();
     _productsCable = Provider.of<ListsActionCableProvider>(widget.ctx);
     _productsCable.initCable();
+  }
+
+  _initParticipantes(int id) async {
+    List usuarios = await _productsCable.listFriends(id);
+    _participantes = usuarios.length;
+    if(ref == false){
+      setState(() {
+      
+      });
+      ref = true;
+    }
   }
 
   @override
@@ -54,6 +66,7 @@ class _ListDetailState extends State<ListDetail>{
     argumentos = ModalRoute.of(context).settings.arguments;
     _listItem = argumentos['listItem'];
     _productsCable2 = Provider.of<ListsActionCableProvider>(context, listen: false);
+    _initParticipantes(_listItem['id']);
     //print(identificador);
     return Scaffold(
         body: NestedScrollView(
@@ -128,6 +141,7 @@ class _ListDetailState extends State<ListDetail>{
   }
 
   Widget _posterTitulo(BuildContext context, Map<String, dynamic> listItem){
+     _initParticipantes(_listItem['id']);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       child: Row(
@@ -153,7 +167,7 @@ class _ListDetailState extends State<ListDetail>{
                  overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.subtitle,),
 
-                Text('4 Participantes',
+                Text('$_participantes Participantes',
                  overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.subhead,),
 
@@ -348,12 +362,16 @@ Widget _buildFriends(BuildContext context, ListsActionCableProvider fp) {
       _estadoModal(() {
         _productsCable.listFriends(_listItem['id']);
       });
+      setState(() {
+                _productsCable.listFriends(_listItem['id']);
+
+      });
     });
     return Future.delayed(duration);
   }
 
   Widget _userCard(BuildContext context,Map u){
-    final fp = Provider.of<FriendsProvider>(context);
+    final fp = Provider.of<ListsActionCableProvider>(context, listen: false);
     return Container(
       margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
       padding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
@@ -371,14 +389,20 @@ Widget _buildFriends(BuildContext context, ListsActionCableProvider fp) {
                 foregroundColor: Colors.white,
               ),
               title: Text('${u['username']}', style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
-              //subtitle:  Text('${u['username']}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
-              trailing: IconButton(icon: Icon(Icons.delete, color: Colors.deepOrange,),onPressed: () async {
-
+              trailing: IconButton(icon: Icon(Icons.delete, color: Colors.deepOrange,),onPressed: () {
+                deleteUser(fp, u);
+                /*_estadoModal(() {
+                  fp.listFriends(_listItem['id']);
+                });*/
               },),
         ),
        ),
       ),
     );
+  }
+
+  deleteUser(ListsActionCableProvider fp, Map<String, dynamic> u) async {
+    final resp = await fp.deleteFriendFromList(_listItem['id'], u['username']);
   }
 
   Widget buildBody(AsyncSnapshot<ActionCableDataState> snapshot, BuildContext context) {
