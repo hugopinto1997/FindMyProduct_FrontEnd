@@ -240,5 +240,24 @@ Future getUserLists() async {
   }
 
 
+Future<List> listFriends(int list_id) async {
+
+    final direccionUrl = 'https://findmyproduct-api.herokuapp.com/api/v1/lists/$list_id/users.json';
+
+  final resp = await http.get(direccionUrl, 
+  headers: {
+    'authorization': _token,
+  });
+
+  List usuarios = new List();
+
+  final decodedData = json.decode(resp.body);
+
+  usuarios.addAll(decodedData['users']);
+
+  print(decodedData['users']);
+  return usuarios;
+}
+
 
 }

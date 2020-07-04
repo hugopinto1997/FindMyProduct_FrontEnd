@@ -30,6 +30,7 @@ class _ListDetailState extends State<ListDetail>{
   ListsActionCableProvider _productsCable;
   ListsActionCableProvider _productsCable2;
   int cantidadProductos;
+  StateSetter _estadoModal;
 
 
   
@@ -105,7 +106,7 @@ class _ListDetailState extends State<ListDetail>{
         pinned: true,
         centerTitle: true,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.mode_edit), onPressed: () {
+          IconButton(icon: Icon(Icons.people), onPressed: () {
             editList(context);
           },),
         ],
@@ -260,7 +261,7 @@ class _ListDetailState extends State<ListDetail>{
 
 
 void editList(BuildContext context){
-  final fp = Provider.of<FriendsProvider>(context, listen: false);
+  final fp = Provider.of<ListsActionCableProvider>(context, listen: false);
   final size = MediaQuery.of(context).size;
   showDialog(
     context: context,
@@ -269,7 +270,10 @@ void editList(BuildContext context){
       return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         title: Text('Agrega en \'${_listItem['name']}\' los amigos que podrán participar'),
-        content: Container(
+        content: StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState){
+            _estadoModal = setState;
+            return Container(
             height: size.height*0.35,
             width: size.width,
             child: Column(
@@ -277,6 +281,9 @@ void editList(BuildContext context){
               Expanded(child: _buildFriends(context, fp)),
             ],
           ),
+        );
+          }, 
+        
         ),
         actions: <Widget>[
           RaisedButton(
@@ -306,10 +313,10 @@ void editList(BuildContext context){
   );
 }
 
-Widget _buildFriends(BuildContext context, FriendsProvider fp) {
-    fp.allFriends();
+Widget _buildFriends(BuildContext context, ListsActionCableProvider fp) {
+      fp.listFriends(_listItem['id']);
     return FutureBuilder(
-      future: fp.allFriends(),
+      future: fp.listFriends(_listItem['id']),
       //initialData: [],
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         if(snapshot.hasData){
@@ -338,8 +345,8 @@ Widget _buildFriends(BuildContext context, FriendsProvider fp) {
       seconds: 1
     );
     Timer(duration, (){
-      setState(() {
-        
+      _estadoModal(() {
+        _productsCable.listFriends(_listItem['id']);
       });
     });
     return Future.delayed(duration);
@@ -358,9 +365,6 @@ Widget _buildFriends(BuildContext context, FriendsProvider fp) {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
               child: ListTile(
-              onTap: () { 
-                
-               },
               leading: CircleAvatar(
                 child: Text('${u['username'][0].toString().toUpperCase()}'),
                 backgroundColor: Colors.indigo,
@@ -368,7 +372,9 @@ Widget _buildFriends(BuildContext context, FriendsProvider fp) {
               ),
               title: Text('${u['username']}', style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
               //subtitle:  Text('${u['username']}', style: Theme.of(context).textTheme.subtitle.apply(color: Theme.of(context).textTheme.subhead.color)),
-              trailing: Icon(Icons.delete_forever, color: Colors.lightBlue, size: 32,),
+              trailing: IconButton(icon: Icon(Icons.delete, color: Colors.deepOrange,),onPressed: () async {
+
+              },),
         ),
        ),
       ),
