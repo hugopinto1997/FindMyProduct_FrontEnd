@@ -87,6 +87,40 @@ class ListsActionCableProvider with ChangeNotifier {
     return decodedData['message'].toString();
   }
 
+  Future<String> editList(int id,String name) async {
+     // initCable();
+      final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/lists/update.json', 
+      {
+        'list[name]': name
+      }
+    );
+
+    final resp = await http.patch(direccion, 
+    headers: {
+      'authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData);
+    return decodedData['message'].toString();
+  }
+
+Future deleteList(int listId) async {
+      final direccion = 'https://findmyproduct-api.herokuapp.com/api/v1/lists/$listId.json';
+
+    final resp = await http.delete(direccion, 
+    headers: {
+      'authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData.toString());
+  }
+
   Future<String> addProduct(int id, String name, String description, String quantity) async {
       //initCable();
       final direccion = Uri.https(
@@ -170,13 +204,18 @@ Future<String> addFriend(int id, String name) async {
 
     final resp = await http.post(direccion, 
     headers: {
-      'Authorization': _token,
+      'authorization': _token,
     });
 
-    final decodedData = json.decode(resp.body);
+    if(resp.body.isNotEmpty){
+      final decodedData = json.decode(resp.body);
+      print(decodedData);
+    }else{
+      print('vino vacio...');
+    }
 
-    print(decodedData);
-    return decodedData.toString();
+    //print(decodedData);
+    return 'exito...';
   }
 
 Future getUserLists() async {
@@ -240,5 +279,49 @@ Future getUserLists() async {
   }
 
 
+Future<List> listFriends(int list_id) async {
+
+    final direccionUrl = 'https://findmyproduct-api.herokuapp.com/api/v1/lists/$list_id/users.json';
+
+  final resp = await http.get(direccionUrl, 
+  headers: {
+    'authorization': _token,
+  });
+
+  List usuarios = new List();
+
+  final decodedData = json.decode(resp.body);
+
+  usuarios.addAll(decodedData['users']);
+
+  print(decodedData['users']);
+  return usuarios;
+}
+
+
+Future<String> deleteFriendFromList(int uid, String listname) async {
+      final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/listusers/$uid', 
+      {
+        'name': listname
+      }
+    );
+
+    final resp = await http.delete(direccion, 
+    headers: {
+      'Authorization': _token,
+    });
+
+    if(resp.body.isNotEmpty){
+      final decodedData = json.decode(resp.body);
+      print(decodedData.toString());
+    }else{
+      print('resp.body is empty, cannot parse it');
+    }
+
+    //print(decodedData);
+    return 'success';
+  }
 
 }

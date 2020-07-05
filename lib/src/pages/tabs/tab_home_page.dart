@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/providers/products_provider.dart';
@@ -155,11 +156,33 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
 
   Widget _listaMap(BuildContext context,Map<String, dynamic> listItem, int index){
     final lp = Provider.of<ListsActionCableProvider>(context, listen: false);
-        return Container(
-            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+    final x = Slidable(
+      actionPane: SlidableDrawerActionPane(),
+       actions: <Widget>[
+        IconSlideAction(
+          caption: 'Editar',
+          color: Colors.green,
+          icon: Icons.edit,
+          onTap: () {
+            editList(context,listItem['id'], listItem['name']);
+          },
+        )
+      ],
+      secondaryActions: <Widget>[
+        IconSlideAction(
+          caption: 'Eliminar',
+          color: Colors.red,
+          icon: Icons.delete,
+          onTap: () async {
+            await lp.deleteList(listItem['id']);
+            Fluttertoast.showToast(msg: 'Lista eliminada exitosamente', toastLength: Toast.LENGTH_LONG);
+          },
+        )
+      ],
+      child:Container(
+            margin: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
             child: Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                 color: Theme.of(context).cardColor,
                 margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                 elevation: 5.0,
@@ -182,7 +205,26 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                   ),
                 ),
               ),
-                );
+                ) ,
+    );
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 2,
+                  spreadRadius: 1,
+                  offset: Offset(0.0, 5.0),
+                ),
+        ],
+      ),
+      margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.0),
+              child: x,
+      ),
+    );
   }
 
   createList(BuildContext context, String error){
@@ -195,7 +237,6 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text('Nueva lista', textAlign: TextAlign.center, style: Theme.of(context).textTheme.title,),
           content: Container(
-            height: 120,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,38 +255,105 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                       });
                     },
                   ), 
-                SizedBox(height: 20,),
-                Expanded(
-                  child: RaisedButton(
-                    color: Colors.indigo,
-                    textColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-                    onPressed: () async {
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            RaisedButton(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                color: Colors.blueGrey,
+                padding: EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                 // mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                  SizedBox(width: 10,),
+                  Icon(Icons.add, color: Colors.white,),
+                  SizedBox(width: 5,),
+                  Text('Crear lista', style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.white),),
+                  SizedBox(width: 15,),
+                ],),  
+                onPressed: () async {
                        if(_texto.length > 0 || _texto != ''){
                          await listProvider.createList(_texto);
                          Navigator.of(context).pop();
                          controller.clear();
                          _texto = '';
-                         await listProvider.getUserLists();
-                         setState(()  {
-                           //await listProvider.initCable();
-                         });
                        }else{
                           Fluttertoast.showToast(msg: 'Este campo no puede ir vacío', toastLength: Toast.LENGTH_LONG);
                        }
                         
-                     },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                      Text('Crear lista', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white))
-                    ],), 
-                  ),
-                ),
+                     }
+              ),
+          SizedBox(width: 0,),
+            FlatButton(child: Text('Cerrar'), onPressed: () { 
+              Navigator.of(context).pop(); 
+              controller.clear();
+              },),
+          ],
+        );
+      }, 
+    );
+}
+
+editList(BuildContext context,int id, String name){
+    final listProvider = Provider.of<ListsActionCableProvider>(context, listen: false);
+    controller.text = name;
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Text('Editar lista', textAlign: TextAlign.center, style: Theme.of(context).textTheme.title,),
+          content: Container(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+               TextField(
+                    controller: controller,
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      icon: Icon(Icons.shopping_cart, color: Colors.blue,),
+                      hintText: 'Nombre de la lista',
+                      labelText: 'Lista',
+                    ),
+                    onChanged: (t){
+                      setState(() {
+                        _texto = t;
+                      });
+                    },
+                  ), 
               ],
             ),
           ),
           actions: <Widget>[
+            RaisedButton(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                color: Colors.blueGrey,
+                padding: EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                 // mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                  SizedBox(width: 10,),
+                  Icon(Icons.mode_edit, color: Colors.white,),
+                  SizedBox(width: 5,),
+                  Text('Guardar', style: Theme.of(context).textTheme.subtitle1.copyWith(color: Colors.white),),
+                  SizedBox(width: 15,),
+                ],),  
+                onPressed: () async {
+                       if(_texto.length > 0 || _texto != ''){
+                         await listProvider.editList(id,_texto);
+                         Navigator.of(context).pop();
+                         controller.clear();
+                         _texto = '';
+                       }else{
+                          Fluttertoast.showToast(msg: 'Este campo no puede ir vacío', toastLength: Toast.LENGTH_LONG);
+                       }
+                        
+                     }
+              ),
+          SizedBox(width: 0,),
             FlatButton(child: Text('Cerrar'), onPressed: () { 
               Navigator.of(context).pop(); 
               controller.clear();
