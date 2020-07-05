@@ -87,6 +87,27 @@ class ListsActionCableProvider with ChangeNotifier {
     return decodedData['message'].toString();
   }
 
+  Future<String> editList(int id,String name) async {
+     // initCable();
+      final direccion = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/lists/update.json', 
+      {
+        'list[name]': name
+      }
+    );
+
+    final resp = await http.patch(direccion, 
+    headers: {
+      'authorization': _token,
+    });
+
+    final decodedData = json.decode(resp.body);
+
+    print(decodedData);
+    return decodedData['message'].toString();
+  }
+
 Future deleteList(int listId) async {
       final direccion = 'https://findmyproduct-api.herokuapp.com/api/v1/lists/$listId.json';
 
@@ -183,13 +204,18 @@ Future<String> addFriend(int id, String name) async {
 
     final resp = await http.post(direccion, 
     headers: {
-      'Authorization': _token,
+      'authorization': _token,
     });
 
-    final decodedData = json.decode(resp.body);
+    if(resp.body.isNotEmpty){
+      final decodedData = json.decode(resp.body);
+      print(decodedData);
+    }else{
+      print('vino vacio...');
+    }
 
-    print(decodedData);
-    return decodedData.toString();
+    //print(decodedData);
+    return 'exito...';
   }
 
 Future getUserLists() async {
@@ -273,12 +299,12 @@ Future<List> listFriends(int list_id) async {
 }
 
 
-Future<String> deleteFriendFromList(int list, String username) async {
+Future<String> deleteFriendFromList(int uid, String listname) async {
       final direccion = Uri.https(
       'findmyproduct-api.herokuapp.com',
-      'api/v1/listusers/$list', 
+      'api/v1/listusers/$uid', 
       {
-        'name': username
+        'name': listname
       }
     );
 
@@ -287,10 +313,15 @@ Future<String> deleteFriendFromList(int list, String username) async {
       'Authorization': _token,
     });
 
-    final decodedData = json.decode(resp.body);
+    if(resp.body.isNotEmpty){
+      final decodedData = json.decode(resp.body);
+      print(decodedData.toString());
+    }else{
+      print('resp.body is empty, cannot parse it');
+    }
 
-    print(decodedData);
-    return decodedData.toString();
+    //print(decodedData);
+    return 'success';
   }
 
 }

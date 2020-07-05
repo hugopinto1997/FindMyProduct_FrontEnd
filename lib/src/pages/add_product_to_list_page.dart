@@ -132,10 +132,11 @@ void addProduct(BuildContext context,String product_name, String error){
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         title: Text('Agregará en \'${_listItem['name']}\' el producto $product_name'),
         content: Container(
-            height: size.height*0.35,
+            height: size.height*0.25,
             child: productForm(context, product_name),
         ),
         actions: <Widget>[
+          _createButton(context, product_name),
           FlatButton(child: Text('Cerrar'), onPressed: () => Navigator.of(context).pop(),),
         ],
       );
@@ -155,7 +156,7 @@ Widget productForm(BuildContext context, String name){
               SizedBox(height: 10,),
               _createQuantity(),
               SizedBox(height: 30,),
-              _createButton(context, name),
+              //_createButton(context, name),
             ],
           ),
         ),
@@ -216,13 +217,16 @@ Widget _createQuantity(){
 Widget _createButton(BuildContext context, String name){
 
      return RaisedButton(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        color: Colors.blueAccent,
+        padding: EdgeInsets.symmetric(vertical: 0),
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            child: Text('Agregar Pruducto')
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            child: Text('Guardar cambios')
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 0.0,
-          color: Colors.indigo,
+          //color: Colors.indigo,
           textColor: Colors.white,
           onPressed: () { _submit(context, name); },
         );

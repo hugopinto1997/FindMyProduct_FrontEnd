@@ -128,8 +128,8 @@ _agregarAmigo(BuildContext context, int userid, String username) {
         actions: <Widget>[
           FlatButton(child: Text('Agregar a la lista'), 
           onPressed: () {
-            //Fluttertoast.showToast(msg: '${_listItem['id']} \n $username  ', toastLength: Toast.LENGTH_LONG);
-           addUser(userid, _listItem['name'].toString(), listProvider);
+            Fluttertoast.showToast(msg: 'Usuario añadido exitosamente!', toastLength: Toast.LENGTH_LONG);
+          addUser(userid, _listItem['name'].toString(), listProvider);
            Navigator.of(context).pop();
            Navigator.of(context).pop();
           }),
@@ -140,9 +140,8 @@ _agregarAmigo(BuildContext context, int userid, String username) {
   );
 }
 
-addUser(int listId, String username, ListsActionCableProvider listProv) async{
-  final r = await listProv.addFriend(listId, username);
-  //print('simon');
+addUser(int listId, String username, ListsActionCableProvider listProv) async {
+  String r = await listProv.addFriend(listId, username);
 }
 
 

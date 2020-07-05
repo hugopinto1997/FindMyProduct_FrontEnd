@@ -358,13 +358,14 @@ Widget _buildFriends(BuildContext context, ListsActionCableProvider fp) {
     final duration = new Duration(
       seconds: 1
     );
-    Timer(duration, (){
+    Timer(duration, () async{
+      List f = await  _productsCable.listFriends(_listItem['id']);
+      _participantes = f.length;
       _estadoModal(() {
-        _productsCable.listFriends(_listItem['id']);
+       // _productsCable.listFriends(_listItem['id']);
       });
       setState(() {
-                _productsCable.listFriends(_listItem['id']);
-
+          
       });
     });
     return Future.delayed(duration);
@@ -390,10 +391,14 @@ Widget _buildFriends(BuildContext context, ListsActionCableProvider fp) {
               ),
               title: Text('${u['username']}', style: Theme.of(context).textTheme.title.apply(color: Theme.of(context).textTheme.headline.color), overflow: TextOverflow.ellipsis,),
               trailing: IconButton(icon: Icon(Icons.delete, color: Colors.deepOrange,),onPressed: () {
-                deleteUser(fp, u);
-                /*_estadoModal(() {
-                  fp.listFriends(_listItem['id']);
-                });*/
+                if(fp.userIdentifier == u['id']){
+                Fluttertoast.showToast(msg: 'No puedes autoeliminarte de la lista', toastLength: Toast.LENGTH_LONG);
+                }else{
+                  deleteUser(fp, u);
+                }
+                _estadoModal(() {
+                   fp.listFriends(_listItem['id']);
+                });
               },),
         ),
        ),
@@ -402,7 +407,7 @@ Widget _buildFriends(BuildContext context, ListsActionCableProvider fp) {
   }
 
   deleteUser(ListsActionCableProvider fp, Map<String, dynamic> u) async {
-    final resp = await fp.deleteFriendFromList(_listItem['id'], u['username']);
+    final resp = await fp.deleteFriendFromList(u['id'], _listItem['name']);
   }
 
   Widget buildBody(AsyncSnapshot<ActionCableDataState> snapshot, BuildContext context) {
@@ -580,12 +585,13 @@ void addProduct(BuildContext context,String product_name, String description, St
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         title: Text('Editará de \'${_listItem['name']}\' el producto $product_name'),
         content: SingleChildScrollView(
-                  child: Container(
-              height: size.height*0.35,
+              child: Container(
+              height: size.height*0.25,
               child: productForm(context, product_name, description, quantity),
           ),
         ),
         actions: <Widget>[
+          _createButton(context, product_name),
           FlatButton(child: Text('Cerrar'), onPressed: () => Navigator.of(context).pop(),),
         ],
       );
@@ -603,8 +609,8 @@ Widget productForm(BuildContext context, String name, String description, String
             _createDescription(description),
             SizedBox(height: 10,),
             _createQuantity(quantity),
-            SizedBox(height: 30,),
-            _createButton(context, name),
+            //SizedBox(height: 30,),
+            //_createButton(context, name),
           ],
         ),
       ),
@@ -664,13 +670,16 @@ Widget _createQuantity(String q){
 Widget _createButton(BuildContext context, String name){
 
      return RaisedButton(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        color: Colors.blueAccent,
+        padding: EdgeInsets.symmetric(vertical: 0),
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: 10),
             child: Text('Guardar cambios')
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 0.0,
-          color: Colors.indigo,
+          //color: Colors.indigo,
           textColor: Colors.white,
           onPressed: () { _submit(context, name); },
         );
