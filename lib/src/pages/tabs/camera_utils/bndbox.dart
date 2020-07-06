@@ -10,7 +10,10 @@
  */
 
 import 'package:flutter/material.dart';
+import 'package:prototipo_super_v2/src/providers/camera_provider.dart';
 import 'dart:math' as math;
+
+import 'package:provider/provider.dart';
 
 class BndBox extends StatelessWidget {
   final List<dynamic> results;
@@ -19,13 +22,14 @@ class BndBox extends StatelessWidget {
   final double screenH;
   final double screenW;
   final String model;
+  String objeto;
 
   BndBox(this.results, this.previewH, this.previewW, this.screenH, this.screenW,
-      this.model);
+      this.model, this.objeto);
 
   @override
   Widget build(BuildContext context) {
-
+    final camProvider = Provider.of<CameraProvider>(context);
     List<Widget> _renderBoxes() {
       return results.map((re) {
         var _x = re["rect"]["x"];
@@ -52,6 +56,11 @@ class BndBox extends StatelessWidget {
           y = (_y - difH / 2) * scaleH;
           h = _h * scaleH;
           if (_y < difH / 2) h -= (difH / 2 - _y) * scaleH;
+        }
+        if(re["confidenceInClass"] * 100 > 50 ){
+          camProvider.setObjeto(re["detectedClass"].toString());
+          //camProvider.setConfidence((re["confidenceInClass"] * 100).toStringAsFixed(0));
+          camProvider.setModel("");
         }
 
         return ( _x < 0.09 || _y < 0.09 || _w < 0.09 || _h < 0.09) ? Center(
@@ -92,7 +101,7 @@ class BndBox extends StatelessWidget {
               ),
             ),
             child: new Text(
-              "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}% $_x",
+              "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}% ",
               style: TextStyle(
                 color: Color.fromRGBO(37, 213, 253, 1.0),
                 fontSize: 16.0,

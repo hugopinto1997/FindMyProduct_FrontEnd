@@ -19,6 +19,7 @@ import 'package:prototipo_super_v2/src/pages/list_detail_page.dart';
 import 'package:prototipo_super_v2/src/pages/login_page.dart';
 import 'package:prototipo_super_v2/src/pages/register_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_camera_page.dart';
+import 'package:prototipo_super_v2/src/providers/camera_provider.dart';
 import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/providers/products_provider.dart';
@@ -60,6 +61,9 @@ class MyApp extends StatelessWidget {
         Provider(create: (_) => ProductsProvider(loggedUser, pagina),),
         ChangeNotifierProvider(
           create: (_) => ThemeProvider(currentTheme),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CameraProvider(),
         ),
       ],
       child: _MaterialChild()
