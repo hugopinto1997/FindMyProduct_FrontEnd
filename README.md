@@ -1,15 +1,21 @@
-# prototipo_super_v2
+# FindMyProduct
 
-A new Flutter project.
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/hugopinto1997/FindMyProduct_FrontEnd/blob/master/CONTRIBUTING.md) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) [![release](https://img.shields.io/github/v/release/hugopinto1997/FindMyProduct_FrontEnd?style=flat&label=release&color=blueviolet&maxAge=2592000)]()
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+FindMyProduct is a new mobile app, where it can be possible to detect objects in real time, helping people with shopping of groceries and supermarket products, it has some characteristics like recognizing objects with the phone camera.
 
-A few resources to get you started if this is your first Flutter project:
+<p align="center"><img src="./assets/Images/logo.jpg" alt="App logo" width="250px" height="250px"></p>
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Install
+
+To download and run it just clone the repo and do the following into your terminal:
+
+```
+flutter pub get
+```
+
+If necessary, open Android Studio and synchronize Gradle Files.
 
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
