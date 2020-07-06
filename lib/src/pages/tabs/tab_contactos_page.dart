@@ -25,7 +25,7 @@ class _TabContactosPageState extends State<TabContactosPage> with AutomaticKeepA
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.search), onPressed: () {}, alignment: Alignment.centerLeft,),
+          //IconButton(icon: Icon(Icons.search), onPressed: () {}, alignment: Alignment.centerLeft,),
         ],
       ),
       body: Container(

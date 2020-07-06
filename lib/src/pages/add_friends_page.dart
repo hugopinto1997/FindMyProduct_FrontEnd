@@ -48,9 +48,6 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(onPressed: (){
-            getcosa(friendsProvider);
-      }),
     );
   }
 
