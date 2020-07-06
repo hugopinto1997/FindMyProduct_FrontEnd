@@ -1,106 +1,103 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/providers/products_provider.dart';
-import 'package:prototipo_super_v2/src/search/search_products_delegate.dart';
 import 'package:provider/provider.dart';
 
-class AddProductToListPage extends StatefulWidget {
-final BuildContext ctx;
-AddProductToListPage({@required this.ctx});
 
-  @override
-  _AddProductToListPageState createState() => _AddProductToListPageState();
-}
-
-class _AddProductToListPageState extends State<AddProductToListPage> {
+class ProductsDataSearch extends SearchDelegate{
+  BuildContext con;
+  ProductsProvider pp;
   final formKey = GlobalKey<FormState>();
   String _descripcion, _cantidad;
-  Map<String, dynamic> argumentos;
   Map<String, dynamic> _listItem;
 
-@override
-void initState() { 
-  super.initState();
-  final productsProvider = Provider.of<ProductsProvider>(widget.ctx);
-  load(productsProvider);
-}
-
-load(ProductsProvider p) async{
-  await p.getAllProducts();
-}
-
-
-  @override
-  Widget build(BuildContext context) {
-    final productsProvider = Provider.of<ProductsProvider>(context);
-    argumentos = ModalRoute.of(context).settings.arguments;
-    _listItem = argumentos['listItem'];
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Agrega un producto', style: Theme.of(context).textTheme.title.copyWith(color: Colors.white)),
-        centerTitle: false,
-        elevation: 5,
-        backgroundColor: Theme.of(context).appBarTheme.color,
-        actions: <Widget>[
-         IconButton(icon: Icon(Icons.search), onPressed: () {
-            showSearch(
-              context: context,
-              delegate: ProductsDataSearch(context, _listItem),
-            );    
-          }, alignment: Alignment.centerLeft,),
-        ],
-      ),
-      body: Container(
-        padding: EdgeInsets.only(top: 10),
-        child: Column(
-          children: <Widget>[
-            Expanded(child: _buildProducts(context, productsProvider)),
-          ],
-        ),
-      ),
-    );
+  ProductsDataSearch(BuildContext ctx, Map<String, dynamic> l){
+    this.con = ctx;
+    pp = Provider.of<ProductsProvider>(con, listen: false);
+    _listItem = l;
   }
 
-Widget _buildProducts(BuildContext context, ProductsProvider pp) {
-    pp.getAllProducts();
-    return FutureBuilder(
+@override
+ThemeData appBarTheme(BuildContext context) {
+    return Theme.of(context);
+}
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    // Acciones de nuestro appbar
+    return [
+      IconButton(
+        icon: Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+        ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    // Icono a la izquierda del appbar
+    return IconButton(
+      icon: AnimatedIcon(
+        icon: AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+        ),
+      onPressed: () {
+        // Esto funciona pero solo para cerrarlo a lo bruto
+        //Navigator.pop(context);
+
+        // Ya tiene el metodo close
+        close(context, null);
+      });
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    // Crea los resultados que mostraremos
+    return Container();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    // Son las sugerencias que aparecen cuando escribe
+
+    if (query.isEmpty){
+      return FutureBuilder(
       future: pp.getAllProducts(),
-      //initialData: [],
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+        
+        final products = snapshot.data;
         if(snapshot.hasData){
-          return _buildProduct(context,snapshot.data);
+          return ListView(
+            children: products.map((product){
+              return _productCard(context, product);
+            }).toList(),
+          );
         } else{
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(),);
+        }
+      },
+    );;
+    }
+
+    return FutureBuilder(
+      future: pp.searchProducts(query),
+      builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+        
+        final products = snapshot.data;
+        if(snapshot.hasData){
+          return ListView(
+            children: products.map((product){
+              return _productCard(context, product);
+            }).toList(),
+          );
+        } else{
+          return Center(child: CircularProgressIndicator(),);
         }
       },
     );
-  }
-
-  Widget _buildProduct(BuildContext context, List products){
-     return RefreshIndicator(
-          onRefresh: refresh,
-          child: ListView.builder(
-          itemCount: products.length,
-          itemBuilder: (context, index){
-            return _productCard(context, products[index]);
-          },
-        ),
-     );
-  }
-
-   Future<Null> refresh() async {
-    final duration = new Duration(
-      seconds: 1
-    );
-    Timer(duration, (){
-      setState(() {
-        
-      });
-    });
-    return Future.delayed(duration);
   }
 
    Widget _productCard(BuildContext context,Map p){
@@ -253,5 +250,6 @@ Widget _createButton(BuildContext context, String name){
   }
 
 
+  
 
 }

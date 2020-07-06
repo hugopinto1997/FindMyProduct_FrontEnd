@@ -40,6 +40,41 @@ Future<List<User>> allUsers() async {
   return usuarios.users;  
 }
 
+Future<List<User>> searchUsers(String query) async {
+
+   final direccionUrl = Uri.https(
+      'findmyproduct-api.herokuapp.com',
+      'api/v1/users/search.json', 
+      {
+        'filter': query
+      }
+    );
+
+  final resp = await http.get(direccionUrl, 
+  headers: {
+    'Authorization': token,
+  });
+
+  dynamic decodedData;
+  List<User> u = new List();
+  UserModel usuarios = new UserModel();
+
+    if(resp.body.isNotEmpty){
+      decodedData = json.decode(resp.body);
+      usuarios = UserModel.fromJson(decodedData);
+      u = usuarios.users;
+      print(decodedData);
+    }else{
+      print('se cago');
+    }
+    
+    print(u.toString());
+    return u;  
+  //}
+
+  
+}
+
 Future<Map<String, String>> createFriendship(int fi) async {
 
     final direccion = Uri.https(

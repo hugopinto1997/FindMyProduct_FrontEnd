@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/models/user_model.dart';
 import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
+import 'package:prototipo_super_v2/src/search/search_users_delegate.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,6 +16,10 @@ AddFriendsPage({@required this.ctx});
 
 class _AddFriendsPageState extends State<AddFriendsPage> {
   Map<String, dynamic> _listItem, argumentos;
+
+  getcosa(FriendsProvider fp) async{
+    final f = await fp.searchUsers('hugo');
+  }
  
   @override
   Widget build(BuildContext context) {
@@ -27,7 +32,12 @@ class _AddFriendsPageState extends State<AddFriendsPage> {
         elevation: 5,
         backgroundColor: Theme.of(context).appBarTheme.color,
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.search), onPressed: () {}, alignment: Alignment.centerLeft,),
+          IconButton(icon: Icon(Icons.search), onPressed: () {
+            showSearch(
+              context: context,
+              delegate: DataSearch(context),
+            );    
+          }, alignment: Alignment.centerLeft,),
         ],
       ),
       body: Container(
