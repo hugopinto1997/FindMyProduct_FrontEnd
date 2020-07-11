@@ -200,6 +200,9 @@ class _TabHomePageState extends State<TabHomePage> with AutomaticKeepAliveClient
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                     child: ListTile(
+                    /*onLongPress: (){
+                      Fluttertoast.showToast(msg: 'fff', toastLength: Toast.LENGTH_LONG);
+                    },*/
                     onTap: () { 
                       Navigator.pushNamed(context, 'listDetail', arguments: {'listItem': listItem, 'index': index}).then((value) {
                      if(value == null){

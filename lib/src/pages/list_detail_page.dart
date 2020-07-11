@@ -541,9 +541,9 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
         color: Theme.of(context).cardColor,
         margin: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
         elevation: 10.0,
-        child: CheckboxListTile(
-          activeColor: Colors.green,
-          secondary: Column(
+        child: ListTile(
+          //activeColor: Colors.green,
+          leading: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text('Cant.', style: Theme.of(context).textTheme.subtitle1.copyWith(fontSize: 16),),
@@ -552,11 +552,24 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
           ],),
           title: Text('${product['product_name']}', style: Theme.of(context).textTheme.title,),
           subtitle: (product['product_descripcion'] == null) ? Text('Sin descripción', style: Theme.of(context).textTheme.subtitle1,) : Text('${product['product_descripcion']}',  style: Theme.of(context).textTheme.subtitle1,),
-          value: (product['product_status'] != false) ? true : product['product_status'],
-          onChanged: (newValue) async {
+          onLongPress: () {
+            Navigator.of(context).pushNamed('product_match');
+          },
+          onTap: () async {
+             final r = await productsProvider.setCheck(_listItem['id'].toString(), product['product_name']);
+          },
+          trailing: Checkbox(
+            value: (product['product_status'] != false) ? true : product['product_status'], 
+            activeColor: Colors.green,
+            checkColor: Colors.white,
+            onChanged: (newValue) async {
+               final r = await productsProvider.setCheck(_listItem['id'].toString(), product['product_name']);
+            }),
+          //value: (product['product_status'] != false) ? true : product['product_status'],
+          /*onChanged: (newValue) async {
             final r = await productsProvider.setCheck(_listItem['id'].toString(), product['product_name']);
            
-        },
+        },*/
         ),
       ),
     );

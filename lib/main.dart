@@ -17,6 +17,7 @@ import 'package:prototipo_super_v2/src/pages/home_page.dart';
 import 'package:prototipo_super_v2/src/pages/list_add_friend_page.dart';
 import 'package:prototipo_super_v2/src/pages/list_detail_page.dart';
 import 'package:prototipo_super_v2/src/pages/login_page.dart';
+import 'package:prototipo_super_v2/src/pages/product_match_page.dart';
 import 'package:prototipo_super_v2/src/pages/register_page.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/tab_camera_page.dart';
 import 'package:prototipo_super_v2/src/providers/camera_provider.dart';
@@ -90,6 +91,7 @@ class _MaterialChild extends StatelessWidget {
         'add_friends': (BuildContext context) => AddFriendsPage(ctx: context,),
         'add_product': (BuildContext context) => AddProductToListPage(ctx: context,),
         'add_list_friend': (BuildContext context) => ListAddFriend(),
+        'product_match': (BuildContext context) => ProductMatchPage(cameras),
       },
       theme: theme.getTheme(),
     );

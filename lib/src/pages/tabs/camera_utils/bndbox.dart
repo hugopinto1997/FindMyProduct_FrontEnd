@@ -57,10 +57,13 @@ class BndBox extends StatelessWidget {
           h = _h * scaleH;
           if (_y < difH / 2) h -= (difH / 2 - _y) * scaleH;
         }
-        if(re["confidenceInClass"] * 100 > 50 ){
-          camProvider.setObjeto(re["detectedClass"].toString());
-          //camProvider.setConfidence((re["confidenceInClass"] * 100).toStringAsFixed(0));
+        //if(re["confidenceInClass"] * 100 > 70 ){
+        if( _x > 0.4 && _y > 0.4 ){
+          if(re["confidenceInClass"] * 100 > 65){
+            camProvider.setObjeto('pecsi');
+            camProvider.setConfidence((re["confidenceInClass"] * 100).toStringAsFixed(0));
           camProvider.setModel("");
+          }
         }
 
         return ( _x < 0.09 || _y < 0.09 || _w < 0.09 || _h < 0.09) ? Center(
@@ -92,16 +95,18 @@ class BndBox extends StatelessWidget {
           top: math.max(0, y),
           width: w,
           height: h,
-          child: new Container(
+          child: Container(
             padding: EdgeInsets.only(top: 5.0, left: 5.0),
             decoration: BoxDecoration(
               border: Border.all(
-                color: Color.fromRGBO(37, 213, 253, 1.0),
+                //color: Color.fromRGBO(37, 213, 253, 1.0),
+                color: Colors.blueAccent,
                 width: 3.0,
               ),
+              borderRadius: BorderRadius.circular(5),
             ),
             child: new Text(
-              "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}% ",
+              "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}% $_x $_y $_w",
               style: TextStyle(
                 color: Color.fromRGBO(37, 213, 253, 1.0),
                 fontSize: 16.0,
