@@ -57,6 +57,8 @@ flutter:
   assets:
    - assets/custom-voc.txt
    - assets/custom-voc.tflite
+   - assets/labels.txt
+   - assets/gansitoModel.tflite
    - assets/no-image.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see

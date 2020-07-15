@@ -16,15 +16,22 @@ class CameraProvider with ChangeNotifier{
   String _objeto;
   String _model;
   String _percentage;
+  String _load;
 
   CameraProvider(){
     this._objeto = "";
     this._model = "";
     this._percentage = "";
+    this._load = '';
   }
 
   setObjeto(String o){
     this._objeto = o;
+    notifyListeners();
+  }
+
+  setLoad(String o){
+    this._load = o;
     notifyListeners();
   }
 
@@ -43,5 +50,8 @@ class CameraProvider with ChangeNotifier{
   getConfidence() => this._percentage;
 
   getModel() => this._model;
+
+  getLoad() => this._load;
+
 
 }

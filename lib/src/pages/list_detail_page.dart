@@ -18,6 +18,7 @@ import 'package:action_cable_stream/action_cable_stream_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:prototipo_super_v2/src/providers/camera_provider.dart';
 import 'package:prototipo_super_v2/src/providers/friends_provider.dart';
 import 'package:prototipo_super_v2/src/providers/lists_action_cable_provider.dart';
 import 'package:prototipo_super_v2/src/providers/products_provider.dart';
@@ -512,6 +513,7 @@ Future<Null> refresh2() async {
 Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
   final productsProvider = Provider.of<ProductsProvider>(context);
   final listp = Provider.of<ListsActionCableProvider>(context);
+  final camProv = Provider.of<CameraProvider>(context);
   final lp = Provider.of<ListsActionCableProvider>(context);
     return Slidable(
       actionPane: SlidableDrawerActionPane(),
@@ -553,7 +555,15 @@ Widget _buildSlidableItem(BuildContext context,Map<String, dynamic> product){
           title: Text('${product['product_name']}', style: Theme.of(context).textTheme.title,),
           subtitle: (product['product_descripcion'] == null) ? Text('Sin descripción', style: Theme.of(context).textTheme.subtitle1,) : Text('${product['product_descripcion']}',  style: Theme.of(context).textTheme.subtitle1,),
           onLongPress: () {
-            Navigator.of(context).pushNamed('product_match');
+            String p = product['product_name'].toString();
+            if(product['product_name'] == 'Pepsi' || product['product_name'] == 'Gansito'){
+             setState(() {
+              camProv.setModel('');
+              camProv.setObjeto('');
+              camProv.setLoad(p);
+             });
+              Navigator.of(context).pushNamed('product_match');
+            }
           },
           onTap: () async {
              final r = await productsProvider.setCheck(_listItem['id'].toString(), product['product_name']);

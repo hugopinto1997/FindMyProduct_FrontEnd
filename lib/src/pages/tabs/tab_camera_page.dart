@@ -36,26 +36,85 @@ class _TabCameraPageState extends State<TabCameraPage> {
   int _imageWidth = 0;
   String _model = "";
   String _objeto = "";
+    String _opcionSeleccionada = 'Gansito';
+  List<String> _productos = ['Pepsi','Flan Royale','Gansito', 'Margarina Mazola', 'Jugo Frutsi', 'Avena Quaker', 'Pan Bimbo', 'Coca Cola'];
+
+  List<DropdownMenuItem<String>> getOpts() {
+        List<DropdownMenuItem<String>> lista = new List();
+
+        _productos.forEach((poder){
+          lista.add(DropdownMenuItem(
+            child: Text(poder),
+            value: poder,
+            )
+          );
+        });
+        return lista;
+    }
+
+    Widget _crearDropdown(CameraProvider campro){
+    return Row(
+      children: <Widget>[
+        Icon(Icons.select_all),
+        SizedBox(width: 10.0,),
+        Expanded(
+        child: 
+          DropdownButton(
+            value: _opcionSeleccionada,
+            items: getOpts(),
+            onChanged: (opt){
+            setState(() {
+              campro.setLoad(opt);
+              campro.setObjeto('');
+              _opcionSeleccionada=opt;
+            });
+            },
+          ),
+        )
+      ],
+    );
+  }
 
    @override
   void initState() {
     super.initState();
   }
 
+  String getPhoto(String img){
+    if(img == 'pepsi'){
+      return 'https://www.nicepng.com/png/full/175-1759066_pepsi-2-liter-png-pepsi-1-5-l.png';
+    } else if (img == 'gansito'){
+      return 'https://3.bp.blogspot.com/-eOZkDETgBx0/Wim5rCVXQMI/AAAAAAAAARo/eLXzVN1UKRoQ_FLp8lCl3_0JvGoj4HChQCK4BGAYYCw/s1600/gancito%2B3.png';
+    }
+  }
+
   loadModel() async {
-    await Tflite.loadModel(
+      await Tflite.loadModel(
         model: "assets/custom-voc.tflite",
         labels: "assets/custom-voc.txt");
   }
+
+  loadModelGansito() async {
+      await Tflite.loadModel(
+        model: "assets/gansitoModel.tflite",
+        labels: "assets/labels.txt");
+  }
+
+   
 
   onSelect(BuildContext contexto) {
     final cp = Provider.of<CameraProvider>(context, listen: false);
     setState(() {
       //_model = "PEPSI";
-      cp.setModel("PEPSI");
+      cp.setModel(cp.getLoad());
+      //Fluttertoast.showToast(msg: 'Comencemos a buscar a ${cp.getModel()}!', toastLength: Toast.LENGTH_LONG);
       //_objeto = "f";
     });
-    loadModel();
+    if(cp.getModel() == 'Pepsi'){
+      loadModel();
+    }else{
+      loadModelGansito();
+    }
   }
 
   setRecognitions(recognitions, imageHeight, imageWidth) {
@@ -107,6 +166,12 @@ class _TabCameraPageState extends State<TabCameraPage> {
             Container(
               width: screen.width*0.6,
               height: 45,
+              child: _crearDropdown(camProvider),
+            ),
+            SizedBox(height: 30,),
+            Container(
+              width: screen.width*0.6,
+              height: 45,
               child: RaisedButton(
                 color: Colors.blueGrey,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -129,19 +194,19 @@ class _TabCameraPageState extends State<TabCameraPage> {
             //ProductData("Pepsi 1.5L"),
             FadeInImage(
                       placeholder: AssetImage('assets/no-image.jpg'),
-                      image: NetworkImage('https://www.nicepng.com/png/full/175-1759066_pepsi-2-liter-png-pepsi-1-5-l.png'),
+                      image: NetworkImage(getPhoto(camProvider.getLoad().toString().toLowerCase())),
                      height: 200.0, width:200.0,
                      fit: BoxFit.cover,
                     ),
             SizedBox(height: 10,),
             Container(
               width: screen.width*0.7,
-              child: Text('Pepsi 1.5L', style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+              child: Text('${camProvider.getObjeto()}', style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
             ),
             SizedBox(height: 10,),
             Container(
               width: screen.width*0.7,
-              child: Text('Se ha reconocido una Pepsi de 1.5L, era este su objeto?', style: Theme.of(context).textTheme.subtitle1, textAlign: TextAlign.center,),
+              child: Text('Se reconoció con ${camProvider.getConfidence()}% de confianza', style: Theme.of(context).textTheme.subtitle1, textAlign: TextAlign.center,),
             ),
             SizedBox(height: 20,),
             Container(
@@ -173,9 +238,7 @@ class _TabCameraPageState extends State<TabCameraPage> {
               math.max(_imageHeight, _imageWidth),
               math.min(_imageHeight, _imageWidth),
               screen.height,
-              screen.width,
-              camProvider.getModel(),
-              camProvider.getObjeto()
+              screen.width
               ),
         ],
       ),

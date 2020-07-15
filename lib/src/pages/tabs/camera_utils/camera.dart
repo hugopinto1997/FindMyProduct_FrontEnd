@@ -64,7 +64,7 @@ class _CameraState extends State<Camera> {
               numResultsPerClass: 1,
               threshold: 0.6,
             ).then((recognitions) {
-              //print("Las recognitions son: "+ recognitions.toString());
+              print("Las recognitions son: "+ recognitions.toString());
               widget.setRecognitions(recognitions, img.height, img.width);
               isDetecting = false;
             });

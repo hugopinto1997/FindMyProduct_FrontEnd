@@ -21,11 +21,8 @@ class BndBox extends StatelessWidget {
   final int previewW;
   final double screenH;
   final double screenW;
-  final String model;
-  String objeto;
 
-  BndBox(this.results, this.previewH, this.previewW, this.screenH, this.screenW,
-      this.model, this.objeto);
+  BndBox(this.results, this.previewH, this.previewW, this.screenH, this.screenW);
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +55,9 @@ class BndBox extends StatelessWidget {
           if (_y < difH / 2) h -= (difH / 2 - _y) * scaleH;
         }
         //if(re["confidenceInClass"] * 100 > 70 ){
-        if( _x > 0.4 && _y > 0.4 ){
-          if(re["confidenceInClass"] * 100 > 65){
-            camProvider.setObjeto('pecsi');
+        if( _x > 0.1 && _y > 0.1 ){
+          if(re["confidenceInClass"] * 100 > 50){
+            camProvider.setObjeto(re["detectedClass"]);
             camProvider.setConfidence((re["confidenceInClass"] * 100).toStringAsFixed(0));
           camProvider.setModel("");
           }
@@ -101,12 +98,12 @@ class BndBox extends StatelessWidget {
               border: Border.all(
                 //color: Color.fromRGBO(37, 213, 253, 1.0),
                 color: Colors.blueAccent,
-                width: 3.0,
+                width: 4.0,
               ),
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: new Text(
-              "${re["detectedClass"]} ${(re["confidenceInClass"] * 100).toStringAsFixed(0)}% $_x $_y $_w",
+              "${re["detectedClass"]}",
               style: TextStyle(
                 color: Color.fromRGBO(37, 213, 253, 1.0),
                 fontSize: 16.0,

@@ -11,6 +11,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/camera_utils/bndbox.dart';
 import 'package:prototipo_super_v2/src/pages/tabs/camera_utils/camera.dart';
 import 'package:prototipo_super_v2/src/providers/camera_provider.dart';
@@ -40,19 +41,40 @@ class _ProductMatchPageState extends State<ProductMatchPage> {
   }
 
   loadModel() async {
-    await Tflite.loadModel(
+      await Tflite.loadModel(
         model: "assets/custom-voc.tflite",
         labels: "assets/custom-voc.txt");
   }
+
+  loadModelGansito() async {
+      await Tflite.loadModel(
+        model: "assets/gansitoModel.tflite",
+        labels: "assets/labels.txt");
+  }
+
+   
 
   onSelect(BuildContext contexto) {
     final cp = Provider.of<CameraProvider>(context, listen: false);
     setState(() {
       //_model = "PEPSI";
-      cp.setModel("PEPSI");
+      cp.setModel(cp.getLoad());
+      Fluttertoast.showToast(msg: 'Comencemos a buscar a ${cp.getModel()}!', toastLength: Toast.LENGTH_LONG);
       //_objeto = "f";
     });
-    loadModel();
+    if(cp.getModel() == 'Pepsi'){
+      loadModel();
+    }else{
+      loadModelGansito();
+    }
+  }
+
+  String getPhoto(String img){
+    if(img == 'pepsi'){
+      return 'https://www.nicepng.com/png/full/175-1759066_pepsi-2-liter-png-pepsi-1-5-l.png';
+    } else if (img == 'gansito'){
+      return 'https://3.bp.blogspot.com/-eOZkDETgBx0/Wim5rCVXQMI/AAAAAAAAARo/eLXzVN1UKRoQ_FLp8lCl3_0JvGoj4HChQCK4BGAYYCw/s1600/gancito%2B3.png';
+    }
   }
 
   setRecognitions(recognitions, imageHeight, imageWidth) {
@@ -124,21 +146,21 @@ class _ProductMatchPageState extends State<ProductMatchPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             //ProductData("Pepsi 1.5L"),
-            FadeInImage(
+           FadeInImage(
                       placeholder: AssetImage('assets/no-image.jpg'),
-                      image: NetworkImage('https://www.nicepng.com/png/full/175-1759066_pepsi-2-liter-png-pepsi-1-5-l.png'),
+                      image: NetworkImage(getPhoto('${camProvider.getLoad().toString().toLowerCase()}')),
                      height: 200.0, width:200.0,
                      fit: BoxFit.cover,
                     ),
             SizedBox(height: 10,),
             Container(
               width: screen.width*0.7,
-              child: Text('Pepsi 1.5L', style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+              child: Text('${camProvider.getObjeto()}', style: Theme.of(context).textTheme.title.copyWith(fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
             ),
             SizedBox(height: 10,),
             Container(
               width: screen.width*0.7,
-              child: Text('Se ha reconocido una Pepsi de 1.5L, era este su objeto? ${camProvider.getConfidence()}', style: Theme.of(context).textTheme.subtitle1, textAlign: TextAlign.center,),
+              child: Text('Se reconoció con ${camProvider.getConfidence()}% de confianza', style: Theme.of(context).textTheme.subtitle1, textAlign: TextAlign.center,),
             ),
             SizedBox(height: 20,),
             Container(
@@ -170,9 +192,7 @@ class _ProductMatchPageState extends State<ProductMatchPage> {
               math.max(_imageHeight, _imageWidth),
               math.min(_imageHeight, _imageWidth),
               screen.height,
-              screen.width,
-              camProvider.getModel(),
-              camProvider.getObjeto()
+              screen.width
               ),
         ],
       ),
