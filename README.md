@@ -5,7 +5,6 @@
 
 FindMyProduct is a new mobile app, where it can be possible to detect objects in real time, helping people with shopping of groceries and supermarket products, it has some characteristics like recognizing objects with the phone camera.
 
-<p align="center"><img src="./assets/Images/logo.jpg" alt="App logo" width="250px" height="250px"></p>
 
 ## Install
 
